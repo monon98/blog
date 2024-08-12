@@ -1,0 +1,141 @@
+# 目录
+
+- [目录](#目录)
+  - [某些情况下,我们需要通过代理才能访问特定网络环境下的git资源,git支持代理配置, 支持 http(s), SOCKS4/SOCKS5](#某些情况下我们需要通过代理才能访问特定网络环境下的git资源git支持代理配置-支持-https-socks4socks5)
+    - [HTTP(S)](#https)
+    - [SOCKS(4/5)](#socks45)
+    - [验证代理配置](#验证代理配置)
+    - [关闭代理配置](#关闭代理配置)
+    - [查看代理配置](#查看代理配置)
+    - [代理配置切换](#代理配置切换)
+  - [参考文献](#参考文献)
+
+## 某些情况下,我们需要通过代理才能访问特定网络环境下的git资源,git支持代理配置, 支持 http(s), SOCKS4/SOCKS5
+
+### [HTTP](https://so.csdn.net/so/search?q=HTTP&spm=1001.2101.3001.7020)(S)
+
+HTTP [代理配置](https://so.csdn.net/so/search?q=%E4%BB%A3%E7%90%86%E9%85%8D%E7%BD%AE&spm=1001.2101.3001.7020)格式如下:
+
+```cobol
+git config --global http.proxy http://[proxy]:[port]
+```
+
+实际环境下, 其实我们大多数情况下,并不需要全部git资源都需要通过代理访问, 仅仅某些特定的git库需要通过代理设置,针对特定域名的代理配置就更有实际意义.
+
+```cobol
+git config --global http.[URL].proxy http://[proxy]:[port]
+```
+
+这里的URL指向特定git资源的地址,可以是域名,可以是IP,例如:
+
+```cobol
+git config --global http.https://github.com/.proxy http://sample.com:8080
+```
+
+上述配置意为通过 `http://sample.com:8080` 代理访问 `github.com` .
+
+如果要针对https配置独立的代理, 可以将配置设置为:
+
+```cobol
+git config --global https.https://github.com/.proxy http://sample.com:8080
+```
+
+### SOCKS(4/5)
+
+如果代理服务使用SOCKS4/SOCKS5协议,基于SOCKS的配置如下:
+
+```cobol
+git config --global http.proxy socks5://[proxy]:[port]
+
+git config --global https.proxy socks5://[proxy]:[port]
+```
+
+### 验证代理配置
+
+代理配置操作完后, 可以通过 `git config --global -l` 来查看完整的全局配置
+
+```lua
+git config --global -l
+```
+
+也可以通过查看用户目录下的 `.gitconfig` 来查看全局配置.
+
+```cobol
+# cat ~/.gitconfig
+
+[http "https://github.com/"]
+
+proxy = http://sample.com:8080
+```
+
+### 关闭代理配置
+
+要取消代理配置可以使用 `--unset` 选项.
+
+```php
+git config --global --unset http.proxy
+
+git config --global --unset https.proxy
+```
+
+### 查看代理配置
+
+要查看任何 `git config` 配置,可以使用 `--get` 选项
+
+```lua
+git config
+
+git config
+```
+
+### 代理配置切换
+
+如果需要经常需要切换代理配置的话, 尽量还是构建一个简单易用的脚本,方便我们快速操作, 这里搜集整理了一个 `Shell` 脚本.
+
+添加一个git\_proxy.sh脚本
+
+```csharp
+# vim git_proxy.sh
+```
+
+添加如下内容:
+
+```bash
+#!/bin/bash
+
+case $1 in
+
+on)
+
+git config --global http.proxy 'http://sample.com:8080'
+
+git config --global https.proxy 'http://sample.com:8080'
+
+;;
+
+off)
+
+git config --global --unset http.proxy
+
+git config --global --unset https.proxy
+
+;;
+
+status)
+
+git config --get http.proxy
+
+git config --get https.proxy
+
+;;
+
+esac
+
+exit 0
+```
+
+这样就可以使用 `git_proxy.sh on` 、`git_proxy.sh off`、 `git_proxy.sh status` 命令来快速的开启、关闭、查看代理。
+
+## 参考文献
+
+1. [Git 代理(Proxy) 配置](https://blog.csdn.net/Jessica_hhh/article/details/133142630)
