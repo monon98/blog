@@ -4,22 +4,25 @@ layout: home
 
 hero:
   name: "Monon98's Blog"
-  text: "A VitePress Site"
-  tagline: My great project tagline
+  text: "A VitePress Blog Site"
+  tagline: Monon98的个人成长记录
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: 技术导航
+      link: /技术导航
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: 实用工具
+      link: /tools/1.%20实用工具汇总
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: 技术导航
+    details: 技术导航汇总
+    link: /技术导航
+  - title: 实用工具
+    details: 实用工具汇总
+    link: /tools/1.%20实用工具汇总
+  - title: 面试总结
+    details: 面试难题总结
+    link: /面试难题汇总
 ---
 

@@ -9,9 +9,7 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav,
-
     sidebar,
-
     socialLinks: [
       { icon: "github", link: "https://github.com/monon98/BlogVitepress" },
     ],

@@ -10,6 +10,16 @@ const paths = (dirPath: string) => {
 
 export const sidebar = [
   {
+    text: "实用工具",
+    collapsed: true,
+    items: paths("tools"),
+  },
+  {
+    text: "开发杂项",
+    collapsed: true,
+    items: paths("dev"),
+  },
+  {
     text: "vue",
     collapsed: true,
     items: paths("vue"),
@@ -35,24 +45,9 @@ export const sidebar = [
     items: paths("css"),
   },
   {
-    text: "git",
+    text: "javascript",
     collapsed: true,
-    items: paths("git"),
-  },
-  {
-    text: "javascripts",
-    collapsed: true,
-    items: paths("javascripts"),
-  },
-  {
-    text: "markdown",
-    collapsed: true,
-    items: paths("markdown"),
-  },
-  {
-    text: "mirror",
-    collapsed: true,
-    items: paths("mirror"),
+    items: paths("javascript"),
   },
   {
     text: "sql",
@@ -63,13 +58,12 @@ export const sidebar = [
     text: "root",
     collapsed: true,
     items: [
+      { text: '技术导航', link: '/技术导航' },
+      { text: '面试难题汇总', link: '/面试难题汇总' },
       { text: 'api-examples.md', link: '/api-examples.md' },
       { text: 'index.md', link: '/index.md' },
-      { text: 'interview.md', link: '/interview.md' },
       { text: 'markdown-examples.md', link: '/markdown-examples.md' },
       { text: 'note.md', link: '/note.md' },
-      { text: 'readme.md', link: '/readme.md' },
-      { text: 'tools.md', link: '/tools.md' },
     ],
   },
 ];

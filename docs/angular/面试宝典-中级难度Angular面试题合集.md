@@ -1,38 +1,4 @@
-# 文章目录
-
-- [文章目录](#文章目录)
-  - [好记性不如烂笔头](#好记性不如烂笔头)
-  - [问: Angular是什么？请简要介绍一下Angular框架的特点和优势](#问-angular是什么请简要介绍一下angular框架的特点和优势)
-    - [特点](#特点)
-    - [优势](#优势)
-  - [问: 解释一下Angular中的单向数据流是什么，以及它与双向数据绑定的区别](#问-解释一下angular中的单向数据流是什么以及它与双向数据绑定的区别)
-  - [问: 什么是Angular组件（Component）？请解释一下组件的结构和用法](#问-什么是angular组件component请解释一下组件的结构和用法)
-    - [组件结构](#组件结构)
-    - [组件用法](#组件用法)
-  - [问: Angular中的模块（Module）是什么？请说明一下模块的作用和如何定义和使用模块](#问-angular中的模块module是什么请说明一下模块的作用和如何定义和使用模块)
-    - [模块的作用](#模块的作用)
-    - [定义模块](#定义模块)
-    - [使用模块](#使用模块)
-  - [问: 解释一下Angular中的服务（Service）是什么，以及为什么使用服务来共享数据和逻辑](#问-解释一下angular中的服务service是什么以及为什么使用服务来共享数据和逻辑)
-    - [服务是什么](#服务是什么)
-    - [为什么使用服务来共享数据和逻辑](#为什么使用服务来共享数据和逻辑)
-  - [问: 请解释一下Angular中的依赖注入（Dependency Injection）是什么，以及如何在组件或服务中使用依赖注入](#问-请解释一下angular中的依赖注入dependency-injection是什么以及如何在组件或服务中使用依赖注入)
-    - [依赖注入是什么](#依赖注入是什么)
-    - [如何使用依赖注入](#如何使用依赖注入)
-  - [问: Angular中的指令（Directive）有哪些不同的类型？请举例说明它们的用法](#问-angular中的指令directive有哪些不同的类型请举例说明它们的用法)
-    - [组件（Component）](#组件component)
-    - [属性指令（Attribute Directive）](#属性指令attribute-directive)
-    - [结构指令（Structural Directive）](#结构指令structural-directive)
-  - [问: 解释一下Angular中的路由（Routing）是什么，以及如何配置和使用路由来实现单页面应用](#问-解释一下angular中的路由routing是什么以及如何配置和使用路由来实现单页面应用)
-    - [路由是什么](#路由是什么)
-    - [如何配置和使用路由](#如何配置和使用路由)
-  - [问: Angular中的表单处理有哪些不同的方式？请举例说明模板驱动表单和响应式表单的区别和用法](#问-angular中的表单处理有哪些不同的方式请举例说明模板驱动表单和响应式表单的区别和用法)
-    - [模板驱动表单](#模板驱动表单)
-    - [响应式表单](#响应式表单)
-    - [区别和用法](#区别和用法)
-  - [问: 解释一下Angular中的生命周期钩子函数是什么，包括ngOnInit、ngOnChanges和ngOnDestroy等常用钩子函数的作用和执行顺序](#问-解释一下angular中的生命周期钩子函数是什么包括ngoninitngonchanges和ngondestroy等常用钩子函数的作用和执行顺序)
-    - [执行顺序](#执行顺序)
-
+# 面试宝典-中级难度Angular面试题合集
 
 ## 好记性不如烂笔头
 
@@ -202,7 +168,12 @@ Angular中的指令主要有三种类型：组件（Component）、属性指令�
 组件是Angular应用中最常见的指令类型，它包含了HTML模板、CSS样式以及与之相关的类。组件可以嵌套在其他组件中，并且可以通过属性绑定、事件处理等方式与其他组件通信。例如：
 
 ```typescript
-import { Component } from '@angular/core'; @Component({ selector: 'app-hello-world', template: `<h1>Hello, {{name}}!</h1>`, }) export class HelloWorldComponent { name = 'World'; }
+import { Component } from '@angular/core';
+
+@Component({ selector: 'app-hello-world', template: `<h1>Hello, {{name}}!</h1>`, })
+export class HelloWorldComponent {
+  name = 'World';
+}
 ```
 
 在这个例子中，我们创建了一个名为`HelloWorldComponent`的组件，它有一个名为`name`的属性，该属性被用于模板中的插值表达式。当我们在HTML中使用`<app-hello-world></app-hello-world>`标签时，Angular会渲染出这个组件的视图。
@@ -212,7 +183,15 @@ import { Component } from '@angular/core'; @Component({ selector: 'app-hello-wor
 属性指令用于改变元素的外观或行为，而不会影响其结构。它们通常以`[attribute]`的形式出现在元素上。例如，Angular内置的`ngClass`就是一个属性指令，它可以动态地为元素添加或移除CSS类。以下是一个自定义属性指令的例子：
 
 ```typescript
-import { Directive, ElementRef, HostBinding } from '@angular/core'; @Directive({ selector: '[appHighlight]' }) export class HighlightDirective { @HostBinding('style.backgroundColor') backgroundColor; constructor(private el: ElementRef) { this.backgroundColor = 'yellow'; } }
+import { Directive, ElementRef, HostBinding } from '@angular/core';
+
+@Directive({ selector: '[appHighlight]' })
+export class HighlightDirective {
+  @HostBinding('style.backgroundColor') backgroundColor;
+  constructor(private el: ElementRef) {
+    this.backgroundColor = 'yellow';
+  }
+}
 ```
 
 在这个例子中，我们创建了一个名为`HighlightDirective`的属性指令，它会在元素上设置背景颜色为黄色。要使用这个指令，只需在HTML元素上添加`appHighlight`属性即可。
@@ -222,7 +201,23 @@ import { Directive, ElementRef, HostBinding } from '@angular/core'; @Directive({
 结构指令用于修改DOM的布局，通过添加、移除或重复DOM元素来改变视图的结构。它们通常以`*directive`的形式出现在元素上。例如，Angular内置的`*ngIf`和`*ngFor`就是结构指令，分别用于根据条件显示/隐藏元素和循环遍历数组。以下是一个自定义结构指令的例子：
 
 ```typescript
-import { Directive, TemplateRef, ViewContainerRef } from '@angular/core'; @Directive({ selector: '[appUnless]' }) export class UnlessDirective { constructor( private templateRef: TemplateRef<any>, private viewContainer: ViewContainerRef ) {} set appUnless(condition: boolean) { if (!condition) { this.viewContainer.createEmbeddedView(this.templateRef); } else { this.viewContainer.clear(); } } }
+import { Directive, TemplateRef, ViewContainerRef } from '@angular/core';
+
+@Directive({ selector: '[appUnless]' })
+export class UnlessDirective {
+  constructor(
+    private templateRef: TemplateRef<any>,
+    private viewContainer: ViewContainerRef
+  ) {} 
+  
+  set appUnless(condition: boolean) {
+    if (!condition) {
+      this.viewContainer.createEmbeddedView(this.templateRef);
+    } else {
+      this.viewContainer.clear();
+    }
+  }
+}
 ```
 
 在这个例子中，我们创建了一个名为`UnlessDirective`的结构指令，它类似于`*ngIf`，但条件取反。要使用这个指令，只需在HTML元素上添加`*appUnless="expression"`属性即可。
@@ -242,7 +237,18 @@ Angular中的路由（Routing）是一种机制，允许用户在单页面应用
 以下是一个简单的例子，展示了如何在Angular应用中配置和使用路由：
 
 ```typescript
-import { NgModule } from '@angular/core'; import { RouterModule, Routes } from '@angular/router'; import { HomeComponent } from './home/home.component'; import { AboutComponent } from './about/about.component'; const routes: Routes = [ { path: '', component: HomeComponent }, { path: 'about', component: AboutComponent } ]; @NgModule({ imports: [RouterModule.forRoot(routes)], exports: [RouterModule] }) export class AppRoutingModule { }
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { HomeComponent } from './home/home.component';
+import { AboutComponent } from './about/about.component';
+
+const routes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: 'about', component: AboutComponent }
+];
+
+@NgModule({ imports: [RouterModule.forRoot(routes)], exports: [RouterModule] })
+export class AppRoutingModule {}
 ```
 
 在这个例子中：
@@ -254,7 +260,11 @@ import { NgModule } from '@angular/core'; import { RouterModule, Routes } from '
 要在HTML模板中使用路由，我们可以使用`routerLink`指令，如下所示：
 
 ```html
-<nav> <a routerLink="/">Home</a> <a routerLink="/about">About</a> </nav> <router-outlet></router-outlet>
+<nav>
+  <a routerLink="/">Home</a>
+  <a routerLink="/about">About</a>
+</nav>
+<router-outlet></router-outlet>
 ```
 
 在这里，`routerLink`指令将链接映射到相应的路由路径，而`router-outlet`占位符是路由器用来渲染当前激活组件的地方。
@@ -270,7 +280,17 @@ Angular提供了两种主要的方式来处理表单：模板驱动表单（Temp
 模板驱动表单是基于HTML模板的表单处理方式。它依赖于`ngModel`指令来建立数据绑定，并通过内置的指令如`ngRequired`、`ngMinlength`等进行简单的验证。这种形式的表单适用于较小且简单的需求，其配置和使用通常较为直观。
 
 ```html
-<form #heroForm="ngForm" (ngSubmit)="onSubmit()"> <div> <label for="name">Name:</label> <input type="text" id="name" name="name" [(ngModel)]="hero.name" #name="ngModel" required> <div *ngIf="name.invalid && (name.dirty || name.touched)"> <div *ngIf="name.errors.required">Name is required.</div> </div> </div> <!-- Other form controls --> <button type="submit" [disabled]="!heroForm.form.valid">Submit</button> </form>
+<form #heroForm="ngForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" [(ngModel)]="hero.name" #name="ngModel" required>
+    <div *ngIf="name.invalid && (name.dirty || name.touched)">
+      <div *ngIf="name.errors.required">Name is required.</div>
+    </div>
+  </div>
+  <!-- Other form controls -->
+  <button type="submit" [disabled]="!heroForm.form.valid">Submit</button>
+</form>
 ```
 
 在这个例子中：
@@ -284,7 +304,24 @@ Angular提供了两种主要的方式来处理表单：模板驱动表单（Temp
 响应式表单是一种更灵活和可扩展的表单处理方式，它完全在组件类中创建和管理表单模型。响应式表单允许开发者拥有对表单控件状态和验证过程的完全控制，适合于更复杂的场景。
 
 ```typescript
-import { Component } from '@angular/core'; import { FormBuilder, FormGroup, Validators } from '@angular/forms'; @Component({ selector: 'app-hero-form', template: ` <form [formGroup]="heroForm" (ngSubmit)="onSubmit()"> <div> <label for="name">Name:</label> <input type="text" id="name" formControlName="name"> <div *ngIf="heroForm.get('name').invalid && (heroForm.get('name').dirty || heroForm.get('name').touched)"> <div *ngIf="heroForm.get('name').errors.required">Name is required.</div> </div> </div> <!-- Other form controls --> <button type="submit" [disabled]="!heroForm.valid">Submit</button> </form> ` }) export class HeroFormComponent { heroForm: FormGroup; constructor(private formBuilder: FormBuilder) { this.heroForm = this.formBuilder.group({ name: ['', Validators.required] }); } onSubmit() { if (this.heroForm.valid) { // Process the form data } } }
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+@Component({ selector: 'app-hero-form', template: ` <form [formGroup]="heroForm" (ngSubmit)="onSubmit()"> <div> <label for="name">Name:</label> <input type="text" id="name" formControlName="name"> <div *ngIf="heroForm.get('name').invalid && (heroForm.get('name').dirty || heroForm.get('name').touched)"> <div *ngIf="heroForm.get('name').errors.required">Name is required.</div> </div> </div> <!-- Other form controls --> <button type="submit" [disabled]="!heroForm.valid">Submit</button> </form> ` })
+export class HeroFormComponent {
+  
+  heroForm: FormGroup;
+  
+  constructor(private formBuilder: FormBuilder) {
+    this.heroForm = this.formBuilder.group({ name: ['', Validators.required] });
+  }
+  
+  onSubmit() {
+    if (this.heroForm.valid) {
+      // Process the form data
+    }
+  }
+}
 ```
 
 在这个例子中：

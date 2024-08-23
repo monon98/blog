@@ -1,9 +1,4 @@
-# 文章目录
-
-- [文章目录](#文章目录)
-  - [1. Object.defineProperty](#1-objectdefineproperty)
-  - [2. 响应式布局框架](#2-响应式布局框架)
-  - [3. Form表单提交数据给一个非同源的网址，如在A网址(http://www.A.com)上直接向B网站(http://www.B.com)发送数据请求, 为什么不会触发浏览器的同源策略限制呢？](#3-form表单提交数据给一个非同源的网址如在a网址httpwwwacom上直接向b网站httpwwwbcom发送数据请求-为什么不会触发浏览器的同源策略限制呢)
+# javascript 疑点汇总
 
 ## 1. Object.defineProperty
 
