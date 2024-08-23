@@ -20,8 +20,9 @@ export default defineConfig({
       provider: "local",
     },
   },
+  base: '/BlogVitepress/',
   srcDir,
   cacheDir: "./.cache",
-  dir: "./dist",
+  outDir: "./dist",
   lastUpdated: true,
 });

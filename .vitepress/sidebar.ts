@@ -12,52 +12,52 @@ export const sidebar = [
   {
     text: "vue",
     collapsed: true,
-    items: paths("/vue"),
+    items: paths("vue"),
   },
-  {
-    text: "react",
-    collapsed: true,
-    items: paths("/react"),
-  },
+  // {
+  //   text: "react",
+  //   collapsed: true,
+  //   items: paths("react"),
+  // },
   {
     text: "android",
     collapsed: true,
-    items: paths("/android"),
+    items: paths("android"),
   },
   {
     text: "angular",
     collapsed: true,
-    items: paths("/angular"),
+    items: paths("angular"),
   },
   {
     text: "css",
     collapsed: true,
-    items: paths("/css"),
+    items: paths("css"),
   },
   {
     text: "git",
     collapsed: true,
-    items: paths("/git"),
+    items: paths("git"),
   },
   {
     text: "javascripts",
     collapsed: true,
-    items: paths("/javascripts"),
+    items: paths("javascripts"),
   },
   {
     text: "markdown",
     collapsed: true,
-    items: paths("/markdown"),
+    items: paths("markdown"),
   },
   {
     text: "mirror",
     collapsed: true,
-    items: paths("/mirror"),
+    items: paths("mirror"),
   },
   {
     text: "sql",
     collapsed: true,
-    items: paths("/sql"),
+    items: paths("sql"),
   },
   {
     text: "root",
