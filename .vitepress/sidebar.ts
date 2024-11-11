@@ -1,28 +1,85 @@
 import fs from "fs";
+import path from "node:path";
+
+interface Item {
+  text: string,
+  collapsed?: boolean,
+  link?: string,
+  items?: Array<Item>,
+};
 
 export const srcDir: string = "./docs";
 
-const paths = (dirPath: string) => {
-  return fs.readdirSync(`${srcDir}/${dirPath}`).map((fileName: string) => {
-    return { text: fileName, link: `${dirPath}/${fileName}` };
+// const mutiPaths = (dirPath: string) => {
+//   return fs.readdirSync(`${srcDir}/${dirPath}`).map((fileName: string) => {
+//     return { text: fileName, link: `${dirPath}/${fileName}` };
+//   });
+// };
+
+/**
+ * 生成嵌套的目录数据结构
+ * @param dirPath 相对srcDir的目录路径
+ * @returns
+ */
+const mutiPaths = (dirPath: string): Array<Item> => {
+  const result: Array<Item> = [];
+
+  // 获取目录的完整路径
+  const fullPath = path.join(srcDir, dirPath);
+
+  // 读取目录中的所有文件和文件夹
+  const items = fs.readdirSync(fullPath);
+
+  items.forEach((item: string) => {
+    const itemPath = path.join(fullPath, item);
+    const currentItem: Item = {
+      text: item,
+      // collapsed: true,
+      // items: [],
+    };
+
+    // 检查是否为文件夹
+    if (fs.statSync(itemPath).isDirectory()) {
+      currentItem.collapsed = true;
+      currentItem.items = [];
+
+      // 如果是文件夹，递归调用 paths 函数
+      currentItem.items = mutiPaths(path.join(dirPath, item)); // 获取子文件夹内容
+    } else {
+      currentItem.link = `${dirPath}/${item}`;
+    }
+
+    result.push(currentItem); // 将当前项添加到结果
   });
+
+  return result;
 };
 
 export const sidebar = [
   {
     text: "实用工具",
     collapsed: true,
-    items: paths("tools"),
+    items: mutiPaths("tools"),
   },
   {
     text: "开发杂项",
     collapsed: true,
-    items: paths("dev"),
+    items: mutiPaths("dev"),
   },
   {
     text: "vue",
     collapsed: true,
-    items: paths("vue"),
+    items: mutiPaths("vue"),
+  },
+  {
+    text: "user",
+    collapsed: true,
+    items: mutiPaths("user"),
+  },
+  {
+    text: "转载收藏",
+    collapsed: true,
+    items: mutiPaths("转载收藏"),
   },
   // {
   //   text: "react",
@@ -32,27 +89,27 @@ export const sidebar = [
   {
     text: "android",
     collapsed: true,
-    items: paths("android"),
+    items: mutiPaths("android"),
   },
   {
     text: "angular",
     collapsed: true,
-    items: paths("angular"),
+    items: mutiPaths("angular"),
   },
   {
     text: "css",
     collapsed: true,
-    items: paths("css"),
+    items: mutiPaths("css"),
   },
   {
     text: "javascript",
     collapsed: true,
-    items: paths("javascript"),
+    items: mutiPaths("javascript"),
   },
   {
     text: "sql",
     collapsed: true,
-    items: paths("sql"),
+    items: mutiPaths("sql"),
   },
   {
     text: "root",
