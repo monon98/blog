@@ -59,10 +59,25 @@ const mutiPaths = (dirPath: string): Array<Item> => {
 
 export const sidebar = [
   {
-    text: "实用工具",
+    text: "个人收藏",
     collapsed: true,
-    items: mutiPaths("tools"),
+    items: mutiPaths("user"),
   },
+  {
+    text: "转载收藏",
+    collapsed: true,
+    items: mutiPaths("转载收藏"),
+  },
+  {
+    text: "面试难题",
+    collapsed: true,
+    items: mutiPaths("interview"),
+  },
+  // {
+  //   text: "实用工具",
+  //   collapsed: true,
+  //   items: mutiPaths("tools"),
+  // },
   {
     text: "开发杂项",
     collapsed: true,
@@ -72,16 +87,6 @@ export const sidebar = [
     text: "vue",
     collapsed: true,
     items: mutiPaths("vue"),
-  },
-  {
-    text: "user",
-    collapsed: true,
-    items: mutiPaths("user"),
-  },
-  {
-    text: "转载收藏",
-    collapsed: true,
-    items: mutiPaths("转载收藏"),
   },
   // {
   //   text: "react",
@@ -118,10 +123,9 @@ export const sidebar = [
     collapsed: true,
     items: [
       { text: '技术导航', link: '/技术导航' },
-      { text: '面试难题汇总', link: '/面试难题汇总' },
-      { text: 'api-examples.md', link: '/api-examples.md' },
+      // { text: 'api-examples.md', link: '/api-examples.md' },
       { text: 'index.md', link: '/index.md' },
-      { text: 'markdown-examples.md', link: '/markdown-examples.md' },
+      // { text: 'markdown-examples.md', link: '/markdown-examples.md' },
       { text: 'note.md', link: '/note.md' },
     ],
   },
