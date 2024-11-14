@@ -6,6 +6,9 @@ import { srcDir, sidebar } from "./sidebar";
 export default defineConfig({
   title: "Monon98's Blog",
   description: "A VitePress Site",
+  head: [
+    ["link", { rel: "icon", href: "https://avatars.githubusercontent.com/u/107355305?v=4" }],
+  ],
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav,

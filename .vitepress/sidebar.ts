@@ -32,8 +32,10 @@ const mutiPaths = (dirPath: string): Array<Item> => {
 
   items.forEach((item: string) => {
     const itemPath = path.join(fullPath, item);
+    // 处理文件名，去除扩展名
+    const itemName = path.parse(item).name; // 使用 path.parse 来安全地提取文件名
     const currentItem: Item = {
-      text: item,
+      text: itemName,
       // collapsed: true,
       // items: [],
     };
