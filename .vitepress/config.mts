@@ -14,14 +14,14 @@ export default defineConfig({
     nav,
     sidebar,
     socialLinks: [
-      { icon: "github", link: "https://github.com/monon98/BlogVitepress" },
+      { icon: "github", link: "https://github.com/monon98/blog" },
     ],
 
     search: {
       provider: "local",
     },
   },
-  base: '/BlogVitepress/',
+  base: '/blog/',
   srcDir,
   cacheDir: "./.cache",
   outDir: "./dist",

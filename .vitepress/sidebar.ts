@@ -48,7 +48,7 @@ const mutiPaths = (dirPath: string): Array<Item> => {
       // 如果是文件夹，递归调用 paths 函数
       currentItem.items = mutiPaths(path.join(dirPath, item)); // 获取子文件夹内容
     } else {
-      currentItem.link = `${dirPath}/${item}`;
+      currentItem.link = `/${dirPath}/${item}`;
     }
 
     result.push(currentItem); // 将当前项添加到结果
