@@ -4,14 +4,14 @@
 
 <script lang="ts">
 // 雪花类
-class Snowflake {
-  canvas;
-  ctx;
-  x;
-  y;
-  radius;
-  speed;
-  parms;
+export class Snowflake {
+  private canvas;
+  private ctx;
+  private x;
+  private y;private 
+  private radius;
+  private speed;
+  private parms;
   constructor(canvas, parms) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
@@ -19,23 +19,26 @@ class Snowflake {
     this.init();
   }
 
-  init(widthProp?, heightProp?) {
-    const {minRadius, maxRadius, minSpeed, maxSpeed} = this.parms;
-    const width = widthProp?? this.canvas.width;
-    const height = heightProp??this.canvas.height;
-    this.x = random(0, width);
-    this.y = random(0, height);
+  private init(leftProp?, rightProp?) {
+    const { minRadius, maxRadius, minSpeed, maxSpeed } = this.parms;
+    this.x = leftProp ?? random(0, this.canvas.width);
+    this.y = rightProp ?? random(0, this.canvas.height);
     this.radius = random(minRadius, maxRadius);
     this.speed = random(minSpeed, maxSpeed);
   }
 
   // 更新雪花的位置
   update() {
-    this.y += this.speed;
-    this.x += this.speed * (Math.random() * 0.5) + this.speed; // 随机 x 方向移动
+    this.y += this.speed * random(1, 1.05) * this.parms.y;
+    this.x += this.speed * random(1, 1.05) * this.parms.x;
+    this.radius += 0.001;
     if (this.y > this.canvas.height) {
       // 重新从顶部开始 // 随机 x 位置
       this.init(undefined, 0);
+    } else if (this.y < 0) {
+      this.init(undefined, this.canvas.height);
+    } else if (this.x < 0) {
+      this.init(this.canvas.width, undefined);
     } else if (this.x > this.canvas.width) {
       this.init(0, undefined);
     }
@@ -45,7 +48,7 @@ class Snowflake {
   draw() {
     this.ctx.beginPath();
     this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    this.ctx.fillStyle = 'white';
+    this.ctx.fillStyle = this.parms.color;
     this.ctx.fill();
     this.ctx.closePath();
   }
@@ -54,23 +57,21 @@ class Snowflake {
 export const random = (min: number, max: number) => {
   return Math.random() * (max - min) + min;
 };
-
 </script>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, useTemplateRef, reactive } from 'vue';
-
+import { onMounted, onUnmounted, useTemplateRef, computed } from 'vue';
 
 const props = defineProps({
-  snowflakesCount: {
+  count: {
     type: Number,
     default: 100,
   },
-  canvasWidth: {
+  width: {
     type: Number,
     default: 600,
   },
-  canvasHeight: {
+  height: {
     type: Number,
     default: 400,
   },
@@ -84,7 +85,7 @@ const props = defineProps({
   },
   maxRadius: {
     type: Number,
-    default: 4,
+    default: 2,
   },
   minSpeed: {
     type: Number,
@@ -93,37 +94,59 @@ const props = defineProps({
   maxSpeed: {
     type: Number,
     default: 2,
-  },  
+  },
+  backgroundColor: {
+    type: String,
+    default: 'rgba(0, 0, 0, 0.9)',
+  },
+  x: {
+    type: String,
+    default: 'center',
+  },
+  y: {
+    type: String,
+    default: 'end',
+  },
+  color: {
+    type: String,
+    default: 'white',
+  },
 });
 
 // 创建雪花数组
 const snowflakes: Snowflake[] = [];
 const canvasTemplateRef = useTemplateRef<HTMLCanvasElement>('snow-canvas');
+const direction = {
+  start: -1,
+  center: 0,
+  end: 1,
+};
+const x = computed(() => direction[props.x]);
+const y = computed(() => direction[props.y]);
 
 onMounted(() => {
   const canvas: HTMLCanvasElement = canvasTemplateRef.value;
   const ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
 
   // 设置 canvas 尺寸
-  canvas.width = props.canvasWidth || window.innerWidth;
-  canvas.height = props.canvasHeight || window.innerHeight;
+  canvas.width = props.width || window.innerWidth;
+  canvas.height = props.height || window.innerHeight;
 
   const params = {
-      minRadius: props.minRadius,
-      maxRadius: props.maxRadius,
-      minSpeed: props.minSpeed,
-      maxSpeed: props.maxSpeed,
-    };
-  for (let i = 0; i < props.snowflakesCount; i++) {
-    // const x = random(0, canvas.width); // 随机 x 位置
-    // const y = random(0, canvas.height); // 随机 y 位置
-
+    x: x.value,
+    y: y.value,
+    color: props.color,
+    minRadius: props.minRadius,
+    maxRadius: props.maxRadius,
+    minSpeed: props.minSpeed,
+    maxSpeed: props.maxSpeed,
+  };
+  for (let i = 0; i < props.count; i++) {
     snowflakes.push(new Snowflake(canvas, params));
   }
 
   // 动画循环
   function animate() {
-    // ctx.fillStyle = 'rgba(0, 0, 0, 0.332)';
     ctx.clearRect(0, 0, canvas.width, canvas.height); // 清空画布
     snowflakes.forEach(snowflake => {
       snowflake.update();
@@ -155,7 +178,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="css">
-/* 父组件需要脱离文档流 */
+/* 作为背景时，父组件需要脱离文档流 */
 .snow-canvas {
   overflow: hidden;
   position: absolute;
@@ -166,11 +189,9 @@ onUnmounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: rgba(0, 0, 0, 0.9);
 }
 
 canvas {
-
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: v-bind(props.backgroundColor);
 }
 </style>

@@ -5,11 +5,8 @@ navbar: false
 sidebar: false
 ---
 
-<Snowflakes :canvasWidth="800" :canvasHeight="400" />
+<Snowflakes :width="0" :height="0" count="200" x="end" color="skyblue" maxSpeed="10" />
 
 <script setup>
 import Snowflakes from '@components/snowflakes.vue'
 </script>
-
-<style module>
-</style>
