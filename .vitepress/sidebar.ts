@@ -8,7 +8,8 @@ interface Item {
   items?: Array<Item>,
 };
 
-export const srcDir: string = "./docs";
+export const srcDir: string = "./src";
+export const docsDir: string = "./docs";
 
 // const mutiPaths = (dirPath: string) => {
 //   return fs.readdirSync(`${srcDir}/${dirPath}`).map((fileName: string) => {
@@ -18,14 +19,14 @@ export const srcDir: string = "./docs";
 
 /**
  * 生成嵌套的目录数据结构
- * @param dirPath 相对srcDir的目录路径
+ * @param dirPath 相对docsDir的目录路径
  * @returns
  */
 const mutiPaths = (dirPath: string): Array<Item> => {
   const result: Array<Item> = [];
 
   // 获取目录的完整路径
-  const fullPath = path.join(srcDir, dirPath);
+  const fullPath = path.join(srcDir, docsDir, dirPath);
 
   // 读取目录中的所有文件和文件夹
   const items = fs.readdirSync(fullPath);
@@ -48,7 +49,7 @@ const mutiPaths = (dirPath: string): Array<Item> => {
       // 如果是文件夹，递归调用 paths 函数
       currentItem.items = mutiPaths(path.join(dirPath, item)); // 获取子文件夹内容
     } else {
-      currentItem.link = `/${dirPath}/${item}`;
+      currentItem.link = `/${docsDir}/${dirPath}/${item}`;
     }
 
     result.push(currentItem); // 将当前项添加到结果
