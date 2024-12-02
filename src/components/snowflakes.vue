@@ -121,8 +121,8 @@ const direction = {
   center: 0,
   end: 1,
 };
-const x = computed(() => direction[props.x]);
-const y = computed(() => direction[props.y]);
+const x = computed(() => direction[props.x] ?? direction.center);
+const y = computed(() => direction[props.y] ?? direction.center);
 
 onMounted(() => {
   const canvas: HTMLCanvasElement = canvasTemplateRef.value;
@@ -130,7 +130,7 @@ onMounted(() => {
 
   // 设置 canvas 尺寸
   canvas.width = props.width || window.innerWidth;
-  canvas.height = props.height || window.innerHeight;
+  canvas.height = props.height || window.innerHeight * 0.9;
 
   const params = {
     x: x.value,

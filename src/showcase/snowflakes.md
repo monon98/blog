@@ -1,7 +1,7 @@
 ---
 hello: world
 layout: page
-navbar: false
+navbar: true
 sidebar: false
 ---
 
