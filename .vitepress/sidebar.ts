@@ -2,20 +2,15 @@ import fs from "fs";
 import path from "node:path";
 
 interface Item {
-  text: string,
-  collapsed?: boolean,
-  link?: string,
-  items?: Array<Item>,
-};
+  text: string;
+  collapsed?: boolean;
+  link?: string;
+  base?: string;
+  items?: Array<Item>;
+}
 
 export const srcDir: string = "./src";
-export const docsDir: string = "./docs";
-
-// const mutiPaths = (dirPath: string) => {
-//   return fs.readdirSync(`${srcDir}/${dirPath}`).map((fileName: string) => {
-//     return { text: fileName, link: `${dirPath}/${fileName}` };
-//   });
-// };
+export const docsDir: string = "docs";
 
 /**
  * 生成嵌套的目录数据结构
@@ -37,97 +32,65 @@ const mutiPaths = (dirPath: string): Array<Item> => {
     const itemName = path.parse(item).name; // 使用 path.parse 来安全地提取文件名
     const currentItem: Item = {
       text: itemName,
-      // collapsed: true,
-      // items: [],
     };
 
     // 检查是否为文件夹
     if (fs.statSync(itemPath).isDirectory()) {
       currentItem.collapsed = true;
       currentItem.items = [];
+      // currentItem.base = `/${docsDir}/${dirPath}/`;
 
       // 如果是文件夹，递归调用 paths 函数
-      currentItem.items = mutiPaths(path.join(dirPath, item)); // 获取子文件夹内容
+      currentItem.items = mutiPaths(`${dirPath}/${item}`); // 获取子文件夹内容
     } else {
       currentItem.link = `/${docsDir}/${dirPath}/${item}`;
     }
-
     result.push(currentItem); // 将当前项添加到结果
   });
 
   return result;
 };
 
-export const sidebar = [
-  {
-    text: "个人收藏",
-    collapsed: true,
-    items: mutiPaths("user"),
-  },
-  {
-    text: "转载收藏",
-    collapsed: true,
-    items: mutiPaths("转载收藏"),
-  },
-  {
-    text: "面试难题",
-    collapsed: true,
-    items: mutiPaths("interview"),
-  },
-  // {
-  //   text: "实用工具",
-  //   collapsed: true,
-  //   items: mutiPaths("tools"),
-  // },
-  {
-    text: "开发杂项",
-    collapsed: true,
-    items: mutiPaths("dev"),
-  },
-  {
-    text: "vue",
-    collapsed: true,
-    items: mutiPaths("vue"),
-  },
-  // {
-  //   text: "react",
-  //   collapsed: true,
-  //   items: paths("react"),
-  // },
-  {
-    text: "android",
-    collapsed: true,
-    items: mutiPaths("android"),
-  },
-  {
-    text: "angular",
-    collapsed: true,
-    items: mutiPaths("angular"),
-  },
-  {
-    text: "css",
-    collapsed: true,
-    items: mutiPaths("css"),
-  },
-  {
-    text: "javascript",
-    collapsed: true,
-    items: mutiPaths("javascript"),
-  },
-  {
-    text: "sql",
-    collapsed: true,
-    items: mutiPaths("sql"),
-  },
-  {
-    text: "root",
-    collapsed: true,
-    items: [
-      { text: '技术导航', link: '/技术导航' },
-      // { text: 'api-examples.md', link: '/api-examples.md' },
-      { text: 'index.md', link: '/index.md' },
-      // { text: 'markdown-examples.md', link: '/markdown-examples.md' },
-      { text: 'note.md', link: '/note.md' },
-    ],
-  },
-];
+export const sidebar = {
+  '/docs/interview/': [
+    {
+      text: "面试难题",
+      collapsed: false,
+      // base: "/docs/interview/",
+      items: mutiPaths("interview"),
+    }
+  ],
+  '/docs/collection/': [
+    {
+      text: "个人收藏",
+      collapsed: true,
+      // base: "/docs/collection/user/",
+      items: mutiPaths("collection/user"),
+    },
+    {
+      text: "转载收藏",
+      collapsed: true,
+      // base: "/docs/collection/转载收藏/",
+      items: mutiPaths("collection/转载收藏"),
+    },
+  ],
+  "/docs/": [
+    {
+      text: "开发杂项",
+      collapsed: true,
+      // base: "/docs/develop/",
+      items: mutiPaths("develop"),
+    },
+    {
+      text: "root",
+      collapsed: true,
+      items: [
+        { text: "技术导航", link: "/docs/技术导航" },
+        // { text: 'api-examples.md', link: '/api-examples.md' },
+        { text: "index.md", link: "/index.md" },
+        // { text: 'markdown-examples.md', link: '/markdown-examples.md' },
+        { text: "note.md", link: "/docs/note.md" },
+      ],
+    },
+  ],
+};

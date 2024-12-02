@@ -9,20 +9,20 @@ hero:
   actions:
     - theme: brand
       text: 技术导航
-      link: /技术导航
+      link: /docs/技术导航
     # - theme: alt
     #   text: 实用工具
     #   link: /user/1
 
 features:
+  - title: 收藏箱
+    details: 收藏的破烂
+    link: /docs/collection/user/1. 好用工具软件汇总
   - title: 技术导航
     details: 技术导航汇总
-    link: /技术导航
-    # - title: 实用工具
-    #   details: 实用工具汇总
-    #   link: /user/1
-  - title: 面试总结
-    details: 面试难题总结
-    link: /interview/0. 其他面试难题汇总
+    link: /docs/技术导航
+  - title: 面试题
+    details: 面试难题总结&记录
+    link: /docs/interview/0.%20在线面试题网站收集
 ---
 
