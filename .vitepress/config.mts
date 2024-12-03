@@ -40,5 +40,8 @@ export default defineConfig({
         "@components": "/components",
       },
     },
+    server: {
+      open: true,
+    }
   },
 });

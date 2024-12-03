@@ -14,7 +14,12 @@ sidebar: false
 <RandomScroll :immediate="true" />
 <RandomScroll :immediate="false" />
 
+1. [画布](./draw-canvas)
+
+<DrawCanvas backgroundColor="#ffffff" color="#000000" borderColor="red" />
+
 <script setup>
-import Snowflakes from '@components/snowflakes.vue'
-import RandomScroll from '@components/random-scroll.vue'
+import Snowflakes from '@components/snowflakes.vue';
+import RandomScroll from '@components/random-scroll.vue';
+import DrawCanvas from '@components/draw-canvas.vue';
 </script>
