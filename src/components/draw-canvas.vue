@@ -119,23 +119,33 @@ onMounted(() => {
   ctx.lineWidth = lineWidth.value;
   clearCanvas();
 
-  canvas.addEventListener("mousedown", (e) => {
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(e.offsetX, e.offsetY);
-    canvas.addEventListener("mousemove", onMouseMove);
-  });
-
-  canvas.addEventListener("mouseup", (e) => {
-    canvas.removeEventListener("mousemove", onMouseMove);
-    ctx.closePath();
-    ctx.restore();
-  });
+  canvas.addEventListener("mousedown", startDrawing);
+  canvas.addEventListener("mouseup", stopDrawing);
+  canvas.addEventListener("touchstart", startDrawing);
+  canvas.addEventListener("touchend", stopDrawing);
 });
 
 onUnmounted(() => {
   unWatchColor();
+  const canvas = canvasRef.value;
+  canvas.removeEventListener("mousedown", startDrawing);
+  canvas.removeEventListener("mouseup", stopDrawing);
+  canvas.removeEventListener("touchstart", startDrawing);
+  canvas.removeEventListener("touchend", stopDrawing);
 });
+
+const startDrawing = (e) => {
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(e.offsetX, e.offsetY);
+  canvasRef.value.addEventListener("mousemove", onMouseMove);  
+};
+
+const stopDrawing = () => {
+  canvasRef.value.removeEventListener("mousemove", onMouseMove);
+  ctx.closePath();
+  ctx.restore();
+}
 
 const onMouseMove = (e: MouseEvent) => {
   if (isDrawing.value) {
