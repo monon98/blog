@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, useTemplateRef, watch } from "vue";
+import { onMounted, onBeforeUnmount, ref, useTemplateRef, watch } from "vue";
 
 const { backgroundColor, borderColor, ...props } = defineProps({
   width: {
@@ -111,9 +111,9 @@ const imageTypeOptions = [
 
 onMounted(() => {
   const canvas = canvasRef.value;
-  ctx = canvas.getContext("2d");
   canvas.width = props.width;
   canvas.height = props.height;
+  ctx = canvas.getContext("2d");
   ctx.fillStyle = backgroundColor;
   ctx.strokeStyle = color.value;
   ctx.lineWidth = lineWidth.value;
@@ -125,7 +125,7 @@ onMounted(() => {
   canvas.addEventListener("touchend", stopDrawing);
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   unWatchColor();
   const canvas = canvasRef.value;
   canvas.removeEventListener("mousedown", startDrawing);
@@ -135,31 +135,48 @@ onUnmounted(() => {
 });
 
 const startDrawing = (e) => {
+  e.preventDefault();
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(e.offsetX, e.offsetY);
-  canvasRef.value.addEventListener("mousemove", onMouseMove);  
+  canvasRef.value.addEventListener("mousemove", onMouseMove);
+  canvasRef.value.addEventListener("touchmove", onTouchMove);
 };
 
-const stopDrawing = () => {
+const stopDrawing = (e) => {
+  e.preventDefault();
   canvasRef.value.removeEventListener("mousemove", onMouseMove);
+  canvasRef.value.removeEventListener("touchmove", onTouchMove);
   ctx.closePath();
   ctx.restore();
 }
 
 const onMouseMove = (e: MouseEvent) => {
+  e.preventDefault();
+  ctx.lineTo(e.offsetX, e.offsetY);
   if (isDrawing.value) {
-    ctx.lineTo(e.offsetX, e.offsetY);
     ctx.lineWidth = lineWidth.value;
     ctx.strokeStyle = color;
-    ctx.stroke();
   } else {
-    ctx.lineTo(e.offsetX, e.offsetY);
     ctx.lineWidth = 10;
     ctx.strokeStyle = backgroundColor;
-    ctx.stroke();
   }
+  ctx.stroke();
 };
+
+const onTouchMove = (e: TouchEvent) => {
+  e.preventDefault();
+  const canvasBoundingClientRect = canvasRef.value.getBoundingClientRect();
+  ctx.lineTo(e.touches[0].clientX - canvasBoundingClientRect.x, e.touches[0].clientY - canvasBoundingClientRect.y);
+  if (isDrawing.value) {
+    ctx.lineWidth = lineWidth.value;
+    ctx.strokeStyle = color;
+  } else {
+    ctx.lineWidth = 10;
+    ctx.strokeStyle = backgroundColor;
+  }
+  ctx.stroke();
+}
 
 const clearCanvas = () => {
   ctx.fillRect(0, 0, canvasRef.value.width, canvasRef.value.height);
