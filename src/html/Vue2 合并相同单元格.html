@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue2 合并相同单元格</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <button @click="mergeCells">合并相同姓名</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>姓名</th>
+                    <th>年龄</th>
+                    <th>城市</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item, index) in processedItems" :key="item.id">
+                    <td v-if="item.isVisible" :rowspan="item.rowspan">{{ item.name }}</td>
+                    <td>{{ item.age }}</td>
+                    <td>{{ item.city }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                items: [
+                    { id: 1, name: '张三', age: 25, city: '北京' },
+                    { id: 3, name: '张三', age: 28, city: '广州' },
+                    { id: 2, name: '李四', age: 30, city: '上海' },
+                    { id: 4, name: '王五', age: 22, city: '深圳' },
+                    { id: 5, name: '张三', age: 25, city: '武汉' },
+                ],
+                processedItems: [] // 新增处理后的数据
+            },
+            methods: {
+                mergeCells() {
+                    // 创建处理后的数组副本
+                    this.processedItems = JSON.parse(JSON.stringify(this.items));
+                    
+                    let currentName = null;
+                    let currentStartIndex = -1;
+
+                    // 遍历处理数据
+                    for (let i = 0; i < this.processedItems.length; i++) {
+                        const item = this.processedItems[i];
+                        item.isVisible = true;
+                        item.rowspan = 1;
+
+                        if (currentName === item.name) {
+                            // 合并到起始位置
+                            this.processedItems[currentStartIndex].rowspan++;
+                            item.isVisible = false;
+                        } else {
+                            // 新姓名开始
+                            currentName = item.name;
+                            currentStartIndex = i;
+                        }
+                    }
+                }
+            },
+            mounted() {
+                // 初始化处理后的数据
+                this.processedItems = JSON.parse(JSON.stringify(this.items));
+                this.mergeCells()
+            }
+        });
+    </script>
+</body>
+</html>

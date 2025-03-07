@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue 3 Auto Resize Input</title>
+    <!-- 引入 Vue 3 -->
+    <script src="https://unpkg.com/vue@3.2.37/dist/vue.global.js"></script>
+    <style>
+        .container {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+        }
+        .input-box {
+            width: 300px; /* 固定宽度 */
+            height: 40px; /* 固定高度 */
+            border: 1px solid #ccc;
+            padding: 5px;
+            font-size: 27px; /* 初始字体大小 */
+            box-sizing: border-box; /* 包含边框和内边距 */
+            text-align: center; /* 文本居中 */
+            transition: font-size 0.1s ease; /* 平滑过渡字体大小 */
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <input 
+                type="text" 
+                class="input-box" 
+                :style="{ fontSize: fontSize + 'px' }" 
+                v-model="inputValue" 
+                placeholder="请输入内容..." 
+                ref="inputElement"
+            />
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, watch } = Vue;
+
+        createApp({
+            setup() {
+                const inputValue = ref(''); // 存储输入框的内容
+                const fontSize = ref(27); // 初始字体大小
+                const maxFontSize = 27; // 最大字体大小
+                const minFontSize = 12;  // 最小字体大小
+                const previousLength = ref(0); // 记录上一次输入长度
+                const inputElement = ref(null); // 引用输入框元素
+
+                const adjustFontSize = (isAdd) => {
+                    console.log('adjustFontSize');
+                    // const currentLength = inputValue.value.length; // 获取当前输入长度
+                    // const lengthChanged = currentLength - previousLength.value; // 计算长度变化
+                    const maxWidth = inputElement.value.clientWidth; // 减去内边距
+
+                    // 初步判断字体大小变化方向
+                    if (isAdd && inputElement.value.scrollWidth > maxWidth && fontSize.value > minFontSize) {
+                        fontSize.value--; // 字符增加则减小字体
+                        console.log('字符增加则减小字体');
+                        requestAnimationFrame(() => adjustFontSize(isAdd));
+                    } else if (!isAdd && inputElement.value.scrollWidth <= maxWidth && fontSize.value < maxFontSize) {
+                        console.log('字符减少则增大字体');
+                        fontSize.value++; // 字符减少则增大字体
+                        requestAnimationFrame(() => adjustFontSize(true));
+                    }
+                };
+
+                watch(()=> inputValue.value, (newValue, oldValue) => {
+                    adjustFontSize(newValue.length > oldValue.length);
+                });
+
+                return {
+                    inputValue,
+                    fontSize,
+                    adjustFontSize,
+                    inputElement
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

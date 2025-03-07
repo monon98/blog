@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue 3 自动调整高度的 Textarea</title>
+    <!-- 引入 Vue 3 的 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.2.47"></script>
+    <style>
+        textarea {
+            width: 100%; /* 设置宽度为 100% */
+            min-height: 50px; /* 设置最小高度 */
+            resize: none; /* 禁止手动调整大小 */
+            overflow: hidden; /* 隐藏滚动条 */
+            padding: 10px; /* 内边距 */
+            box-sizing: border-box; /* 使内边距包含在宽度和高度内 */
+            border: 1px solid #ccc; /* 边框样式 */
+            border-radius: 4px; /* 圆角边框 */
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const text = ref(''); // 绑定的文本
+                const textareaRef = ref(null); // 引用 textarea
+
+                // 自动调整高度的函数
+                const adjustHeight = () => {
+                    const textarea = textareaRef.value;
+                    textarea.style.height = 'auto'; // 先重置为 auto
+                    textarea.style.height = `${textarea.scrollHeight}px`; // 设置为 scrollHeight
+                };
+
+                // 监听输入事件
+                const handleInput = (event) => {
+                    text.value = event.target.value;
+                    adjustHeight(); // 调整高度
+                };
+
+                // 在组件挂载后初始化高度
+                onMounted(adjustHeight);
+
+                return {
+                    text,
+                    handleInput,
+                    textareaRef,
+                };
+            },
+            template: `
+                <div>
+                    <h1>自动调整高度的 Textarea 示例</h1>
+                    <textarea
+                        ref="textareaRef"
+                        v-model="text"
+                        @input="handleInput"
+                        placeholder="请输入内容..."
+                    ></textarea>
+                </div>
+            `,
+        }).mount('#app');
+    </script>
+</body>
+</html>

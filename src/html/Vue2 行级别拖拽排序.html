@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue2 行级别拖拽排序</title>
+    <style>
+        table {
+            border-collapse: collapse; /* 边框合并 */
+            width: 50%; /* 表格宽度 */
+        }
+        th, td {
+            border: 1px solid black; /* 单元格边框 */
+            padding: 8px; /* 单元格内边距 */
+            text-align: center; /* 文本居中 */
+        }
+        tr.dragging {
+            opacity: 0.5; /* 拖动时透明度 */
+        }
+        .drag-button {
+            cursor: move; /* 鼠标样式为移动 */
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <table id="sortableTable">
+            <thead>
+                <tr>
+                    <th>姓名</th>
+                    <th>年龄</th>
+                    <th>城市</th>
+                    <th>拖拽</th>
+                </tr>
+            </thead>
+            <tbody @dragover.prevent @drop="onDrop">
+                <tr v-for="(item, index) in items" :key="item.id">
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.age }}</td>
+                    <td>{{ item.city }}</td>
+                    <td>
+                        <button class="drag-button" 
+                                :draggable="true" 
+                                @mousedown="onDragStart($event, index)" 
+                                @dragend="onDragEnd">
+                            拖拽
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div>
+            <h3>当前顺序:</h3>
+            <pre>{{ currentOrder }}</pre>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                items: [
+                    { id: 1, name: '张三', age: 25, city: '北京' },
+                    { id: 2, name: '李四', age: 30, city: '上海' },
+                    { id: 3, name: '王五', age: 28, city: '广州' }
+                ],
+                draggingIndex: null,
+                currentOrder: ''
+            },
+            methods: {
+                onDragStart(event, index) {
+                    this.draggingIndex = index; // 保存当前拖拽行的索引
+                    event.target.closest('tr').classList.add('dragging'); // 添加拖拽样式
+                },
+                onDragEnd(event) {
+                    event.target.closest('tr').classList.remove('dragging'); // 移除拖拽样式
+                    this.updateCurrentOrder(); // 更新当前顺序
+                },
+                onDrop(event) {
+                    const targetRow = event.target.closest('tr'); // 获取目标行
+                    const targetIndex = Array.from(targetRow.parentNode.children).indexOf(targetRow); // 获取目标行的索引
+                    
+                    if (targetIndex !== -1 && targetIndex !== this.draggingIndex) {
+                        // 将拖拽的行移动到目标行之前
+                        const itemToMove = this.items.splice(this.draggingIndex, 1)[0];
+                        this.items.splice(targetIndex, 0, itemToMove);
+                    } else if (targetIndex === -1) {
+                        // 将拖拽的行添加到最后
+                        const itemToMove = this.items.splice(this.draggingIndex, 1)[0];
+                        this.items.push(itemToMove);
+                    }
+                },
+                updateCurrentOrder() {
+                    this.currentOrder = JSON.stringify(this.items, null, 2); // 更新当前顺序
+                }
+            }
+        });
+    </script>
+</body>
+</html>
