@@ -1,17 +1,17 @@
-import { defineConfig } from "vitepress";
-import { nav } from "./nav";
-import { srcDir, sidebar } from "./sidebar";
+import { defineConfig } from 'vitepress';
+import { nav } from './nav';
+import { srcDir, sidebar } from './sidebar';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "Monon98's Blog",
-  description: "A VitePress Site",
+  description: 'A VitePress Site',
   head: [
     [
-      "link",
+      'link',
       {
-        rel: "icon",
-        href: "https://avatars.githubusercontent.com/u/107355305?v=4",
+        rel: 'icon',
+        href: 'https://avatars.githubusercontent.com/u/107355305?v=4',
       },
     ],
   ],
@@ -19,30 +19,31 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav,
     sidebar,
-    socialLinks: [{ icon: "github", link: "https://github.com/monon98/blog" }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/monon98/blog' }],
 
     search: {
-      provider: "local",
+      provider: 'local',
     },
   },
-  base: "/blog/",
+  base: '/blog/',
   srcDir,
-  cacheDir: "./.cache",
-  outDir: "./dist",
+  cacheDir: './.cache',
+  outDir: './dist',
   lastUpdated: true,
   rewrites: {
-    "components/:path(.*)": "components/:path",
+    'components/:path(.*)': 'components/:path',
+    'html/:path(.*)': 'html/:path',
   },
   vite: {
     resolve: {
       alias: {
-        "@": "/",
-        "@components": "/components",
+        '@': '/',
+        '@components': '/components',
       },
     },
     server: {
       open: true,
-      host: "0.0.0.0",
-    }
+      host: '0.0.0.0',
+    },
   },
 });

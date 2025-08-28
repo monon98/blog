@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, useTemplateRef, watch } from "vue";
+import { onMounted, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
 
 const { backgroundColor, borderColor, ...props } = defineProps({
   width: {
@@ -61,25 +61,25 @@ const { backgroundColor, borderColor, ...props } = defineProps({
   },
   backgroundColor: {
     type: String,
-    default: "black",
+    default: 'black',
   },
   downloadFileName: {
     type: String,
-    default: "canvas",
+    default: 'canvas',
   },
   borderColor: {
     type: String,
-    default: "white",
+    default: 'white',
   },
   color: {
     type: String,
-    default: "white",
+    default: 'white',
   },
 });
 
 let isDrawing = ref<boolean>(true);
 const lineWidth = ref<number>(2);
-const color = ref<string>("white");
+const color = ref<string>('white');
 const unWatchColor = watch(
   () => props.color,
   (newColor) => {
@@ -87,25 +87,25 @@ const unWatchColor = watch(
   },
   { immediate: true }
 );
-const canvasRef = useTemplateRef("draw-canvas");
+const canvasRef = useTemplateRef('draw-canvas');
 let ctx: CanvasRenderingContext2D;
-const imageType = ref<string>("image/png");
+const imageType = ref<string>('image/png');
 const imageTypeOptions = [
   {
-    value: "image/png",
-    label: "PNG",
+    value: 'image/png',
+    label: 'PNG',
   },
   {
-    value: "image/jpeg",
-    label: "JPEG",
+    value: 'image/jpeg',
+    label: 'JPEG',
   },
   // {
   //   value: "image/svg+xml",
   //   label: "SVG",
   // },
   {
-    value: "image/webp",
-    label: "WebP",
+    value: 'image/webp',
+    label: 'WebP',
   },
 ];
 
@@ -113,25 +113,25 @@ onMounted(() => {
   const canvas = canvasRef.value;
   canvas.width = props.width;
   canvas.height = props.height;
-  ctx = canvas.getContext("2d");
+  ctx = canvas.getContext('2d');
   ctx.fillStyle = backgroundColor;
   ctx.strokeStyle = color.value;
   ctx.lineWidth = lineWidth.value;
   clearCanvas();
 
-  canvas.addEventListener("mousedown", startDrawing);
-  canvas.addEventListener("mouseup", stopDrawing);
-  canvas.addEventListener("touchstart", startDrawing);
-  canvas.addEventListener("touchend", stopDrawing);
+  canvas.addEventListener('mousedown', startDrawing);
+  canvas.addEventListener('mouseup', stopDrawing);
+  canvas.addEventListener('touchstart', startDrawing);
+  canvas.addEventListener('touchend', stopDrawing);
 });
 
 onBeforeUnmount(() => {
   unWatchColor();
   const canvas = canvasRef.value;
-  canvas.removeEventListener("mousedown", startDrawing);
-  canvas.removeEventListener("mouseup", stopDrawing);
-  canvas.removeEventListener("touchstart", startDrawing);
-  canvas.removeEventListener("touchend", stopDrawing);
+  canvas.removeEventListener('mousedown', startDrawing);
+  canvas.removeEventListener('mouseup', stopDrawing);
+  canvas.removeEventListener('touchstart', startDrawing);
+  canvas.removeEventListener('touchend', stopDrawing);
 });
 
 const startDrawing = (e) => {
@@ -139,17 +139,17 @@ const startDrawing = (e) => {
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(e.offsetX, e.offsetY);
-  canvasRef.value.addEventListener("mousemove", onMouseMove);
-  canvasRef.value.addEventListener("touchmove", onTouchMove);
+  canvasRef.value.addEventListener('mousemove', onMouseMove);
+  canvasRef.value.addEventListener('touchmove', onTouchMove);
 };
 
 const stopDrawing = (e) => {
   e.preventDefault();
-  canvasRef.value.removeEventListener("mousemove", onMouseMove);
-  canvasRef.value.removeEventListener("touchmove", onTouchMove);
+  canvasRef.value.removeEventListener('mousemove', onMouseMove);
+  canvasRef.value.removeEventListener('touchmove', onTouchMove);
   ctx.closePath();
   ctx.restore();
-}
+};
 
 const onMouseMove = (e: MouseEvent) => {
   e.preventDefault();
@@ -167,7 +167,10 @@ const onMouseMove = (e: MouseEvent) => {
 const onTouchMove = (e: TouchEvent) => {
   e.preventDefault();
   const canvasBoundingClientRect = canvasRef.value.getBoundingClientRect();
-  ctx.lineTo(e.touches[0].clientX - canvasBoundingClientRect.x, e.touches[0].clientY - canvasBoundingClientRect.y);
+  ctx.lineTo(
+    e.touches[0].clientX - canvasBoundingClientRect.x,
+    e.touches[0].clientY - canvasBoundingClientRect.y
+  );
   if (isDrawing.value) {
     ctx.lineWidth = lineWidth.value;
     ctx.strokeStyle = color;
@@ -176,7 +179,7 @@ const onTouchMove = (e: TouchEvent) => {
     ctx.strokeStyle = backgroundColor;
   }
   ctx.stroke();
-}
+};
 
 const clearCanvas = () => {
   ctx.fillRect(0, 0, canvasRef.value.width, canvasRef.value.height);
@@ -205,7 +208,7 @@ const downloadImage = () => {
   // encoderOptions 可选，表示图像质量，范围从 0 到 1，默认为 0.92
   const dataURL = canvasRef.value.toDataURL(imageType.value);
 
-  const link = document.createElement("a");
+  const link = document.createElement('a');
   link.href = dataURL;
   const imageTypeOption =
     imageTypeOptions.find((option) => option.value === imageType.value) ??
