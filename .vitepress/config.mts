@@ -4,7 +4,7 @@ import { srcDir, sidebar } from './sidebar';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "Monon98's Blog",
+  title: "MONON98's Blog",
   description: 'A VitePress Site',
   head: [
     [
