@@ -16,19 +16,26 @@
 </template>
 
 <script setup lang="ts">
-import {ref, version, onMounted } from "vue";
+import { computed, ref, version } from "vue";
 
-const isBrowser = typeof window !== 'undefined';
+// 统一的浏览器环境检测
+const isBrowser = computed(() => typeof window !== 'undefined');
 
-const userAgent = ref(isBrowser ? navigator.userAgent : 'Server');
-const platform = ref(isBrowser && navigator.userAgentData ? navigator.userAgentData.platform : 'Server');
-const mobile = ref(isBrowser && navigator.userAgentData ? navigator.userAgentData.mobile : false);
-const onLine = ref(isBrowser ? navigator.onLine : true);
-const effectiveType = ref(isBrowser && navigator.connection ? navigator.connection.effectiveType : '4g');
-const rtt = ref(isBrowser && navigator.connection ? navigator.connection.rtt : 0);
-const downlink = ref(isBrowser && navigator.connection ? navigator.connection.downlink : 0);
-const jsHeapSizeLimit = ref(isBrowser && performance && performance.memory ? performance.memory.jsHeapSizeLimit : 0);
-const totalJSHeapSize = ref(isBrowser && performance && performance.memory ? performance.memory.totalJSHeapSize : 0);
+// 统一的浏览器 API 访问函数
+const getBrowserInfo = <T>(getter: () => T, fallback: T): T => {
+  return isBrowser.value ? getter() : fallback;
+};
+
+// 使用 computed 替代 ref，避免不必要的响应式开销
+const userAgent = computed(() => getBrowserInfo(() => navigator.userAgent, 'Server'));
+const platform = computed(() => getBrowserInfo(() => navigator.userAgentData?.platform, 'Server'));
+const mobile = computed(() => getBrowserInfo(() => navigator.userAgentData?.mobile, false));
+const onLine = computed(() => getBrowserInfo(() => navigator.onLine, true));
+const effectiveType = computed(() => getBrowserInfo(() => navigator.connection?.effectiveType, '4g'));
+const rtt = computed(() => getBrowserInfo(() => navigator.connection?.rtt, 0));
+const downlink = computed(() => getBrowserInfo(() => navigator.connection?.downlink, 0));
+const jsHeapSizeLimit = computed(() => getBrowserInfo(() => performance?.memory?.jsHeapSizeLimit, 0));
+const totalJSHeapSize = computed(() => getBrowserInfo(() => performance?.memory?.totalJSHeapSize, 0));
 
 const info = ref('');
 

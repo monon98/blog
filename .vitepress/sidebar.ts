@@ -9,6 +9,15 @@ interface Item {
 }
 
 /**
+ * 处理文件名，去掉前面的数字前缀
+ * @param name 原始文件名或目录名
+ * @returns 处理后的名称
+ */
+const cleanName = (name: string): string => {
+  return name.replace(/^\d+\.?\s*/, '');
+};
+
+/**
  * 生成嵌套的目录数据结构
  * @param dirPath 相对src/docs的目录路径
  * @returns
@@ -21,7 +30,11 @@ const generateSidebar = (dirPath: string): Array<Item> => {
     const items = fs.readdirSync(fullPath);
     items.forEach((item: string) => {
       const itemPath = path.join(fullPath, item);
-      const itemName = path.parse(item).name;
+      let itemName = item;
+      if (!fs.statSync(itemPath).isDirectory()) {
+        itemName = path.parse(item).name;
+      }
+      itemName = cleanName(itemName);
       const currentItem: Item = {
         text: itemName,
       };
