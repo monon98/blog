@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitepress';
 import { nav } from './nav';
-import { srcDir, sidebar } from './sidebar';
+import { sidebar } from './sidebar';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -26,14 +26,10 @@ export default defineConfig({
     },
   },
   base: '/blog/',
-  srcDir,
+  srcDir: './src',
   cacheDir: './.cache',
   outDir: './dist',
   lastUpdated: true,
-  rewrites: {
-    'components/:path(.*)': 'components/:path',
-    'html/:path(.*)': 'html/:path',
-  },
   vite: {
     resolve: {
       alias: {

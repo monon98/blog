@@ -10,6 +10,6 @@ sidebar: false
 <script setup>
 import DrawCanvas from '@components/draw-canvas.vue';
 
-const w = window.innerWidth * 0.6;
+const w = typeof window !== 'undefined' ? window.innerWidth * 0.6 : 800;
 const h = 300;
 </script>
