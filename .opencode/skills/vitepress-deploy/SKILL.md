@@ -28,13 +28,13 @@ GitHub Actions workflow at `.github/workflows/deploy.yml`:
 
 - Triggers on push to `master` branch (NOT `main`)
 - Uses pnpm 9.12.3 (pinned)
-- Uses Node 20
-- Deploys to GitHub Pages via `actions/deploy-pages@v4`
+- Uses Node 22
+- Deploys to GitHub Pages via `actions/deploy-pages@v5`
 - Concurrency: only one deploy at a time, does not cancel in-progress
 
 ## Environment requirements
 
-- **Node**: 20 (matches CI)
+- **Node**: 22 (matches CI)
 - **Package manager**: pnpm with lockfile v9
 - No `.env` files or environment variables needed
 

@@ -7,7 +7,7 @@
 - [在线面试题网站收集](./0.%20在线面试题网站收集)
 - [CSS](./02.%20css/)
 - [JavaScript](./01.%20javascript/)
-- [TypeScript](./03.%20typescript)
+- [TypeScript](./03.%20typescript/)
 - [React](./04.%20react)
 - [Vue](./05.%20vue)
 - [Browser](./06.%20browser)

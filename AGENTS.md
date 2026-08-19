@@ -22,7 +22,7 @@ No lint, typecheck, or test scripts exist. Do not add code quality tooling unles
 - **Output dir**: `dist/`
 - **Base path**: `/blog/` — all generated URLs are prefixed with this
 - **Package manager**: pnpm (lockfile v9). CI pins pnpm 9.12.3
-- **Node**: 20 (CI)
+- **Node**: 22 (CI)
 - **Deploy**: GitHub Actions on push to `master` branch → GitHub Pages
 
 ## Content structure
