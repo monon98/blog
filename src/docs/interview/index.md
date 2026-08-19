@@ -9,7 +9,7 @@
 - [JavaScript](./01.%20javascript/)
 - [TypeScript](./03.%20typescript/)
 - [React](./04.%20react)
-- [Vue](./05.%20vue)
+- [Vue](./05.%20vue/)
 - [Browser](./06.%20browser)
 - [HTML5](./07.%20h5)
 - [Web3基础](./21.%20web3基础)
