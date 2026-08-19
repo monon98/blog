@@ -38,7 +38,7 @@ GitHub Actions workflow at `.github/workflows/deploy.yml`:
 - **Package manager**: pnpm with lockfile v9
 - No `.env` files or environment variables needed
 
-## VitePress config quirks
+## VitePress config
 
 From `.vitepress/config.mts`:
 
@@ -48,6 +48,22 @@ From `.vitepress/config.mts`:
 - `base: '/blog/'` — GitHub Pages subpath
 - `lastUpdated: true` — requires `fetch-depth: 0` in CI (already configured)
 - Dev server: `host: '0.0.0.0'`, `open: true`
+
+## Link format rules
+
+- Use relative paths without `.md` extension
+- Escape spaces as `%20` in links
+- Example: `[Text](./06.%20路由与状态管理#section)`
+
+## SSR considerations
+
+- When using browser-only objects (window, navigator, performance), add conditionals:
+```javascript
+if (typeof window !== 'undefined') {
+  // browser-only code
+}
+```
+- Always run build after changes to verify no SSR errors
 
 ## Troubleshooting
 
