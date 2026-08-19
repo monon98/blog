@@ -16,6 +16,8 @@
 - [Three.js](./11.%20threejs/)
 - [Canvas](./12.%20canvas/)
 - [WebGL](./13.%20webgl/)
+- [小程序](./14.%20miniprogram/)
+- [UniApp](./15.%20uniapp/)
 - [Web3基础](./21.%20web3基础)
 - [BTC](./22.%20btc)
 - [ETH](./23.%20eth)

@@ -85,6 +85,73 @@ Content is written in Chinese (中文). Maintain this convention for all new con
 - No duplicate content across files
 - Build passes without errors
 
+## Content review and deduplication
+
+### Review workflow
+
+After adding or modifying content, always run a full audit:
+
+1. **Correctness check**
+   - Verify API names, parameters, and return values are accurate
+   - Ensure code examples are syntactically correct and runnable
+   - Check that lifecycle hooks and configuration options match the latest version
+   - Validate that platform-specific APIs are attributed to the correct platform
+
+2. **Freshness check**
+   - Confirm framework versions referenced are current (e.g. Vue 3.4+, Three.js r170+)
+   - Update deprecated API mentions with warnings or replacements
+   - Remove or mark obsolete patterns (e.g. Vue 2 syntax in Vue 3 contexts)
+
+3. **Deduplication check**
+   - Search for duplicate code blocks across all files in the same directory
+   - Search for duplicate code blocks across related directories (e.g. `miniprogram/` and `uniapp/`)
+   - Check for duplicate concepts that can be consolidated
+   - Look for similar table/comparison content that appears in multiple places
+
+### Deduplication rules
+
+| Scenario | Action |
+|----------|--------|
+| Same code in same directory | Keep the more complete version, replace the other with a cross-reference |
+| Same code in different directories | Keep in the canonical location, add `::: tip` cross-reference in others |
+| Similar concept explained twice | Consolidate into one location, reference from others |
+| Generic concept (e.g. Vue props) | Keep detailed explanation in the primary topic (e.g. `vue/03`), reference from derived topics (e.g. `uniapp/03`) |
+| Platform-specific variants | Keep separate but note the relationship (e.g. CommonJS vs ES Module) |
+
+### Cross-reference format
+
+Use VitePress custom containers for cross-references:
+
+```markdown
+::: tip
+Detailed explanation见 [02. 生命周期.md](./02.%20生命周期)。
+:::
+```
+
+```markdown
+::: warning
+`FirstPersonControls` 自 Three.js r128 起已被弃用，推荐使用 `PointerLockControls` 替代。
+:::
+```
+
+### Common duplication patterns to check
+
+- `setData` usage patterns across `miniprogram/` and `uniapp/`
+- Component communication (props/$emit) across `vue/`, `miniprogram/`, `uniapp/`
+- Lifecycle hooks across `vue/`, `miniprogram/`, `uniapp/`
+- Performance optimization patterns (lazy loading, caching) across all content directories
+- Event bus / state management implementations across directories
+- Route management across `vue/`, `miniprogram/`, `uniapp/`
+
+### Platform-specific code conventions
+
+| Directory | Module system | API prefix |
+|-----------|---------------|------------|
+| `miniprogram/` | CommonJS (`require`/`module.exports`) | `wx.` |
+| `uniapp/` | ES Module (`import`/`export`) or CommonJS | `uni.` |
+| `vue/` | ES Module | N/A |
+| `electron/` | CommonJS (main) / ES Module (renderer) | N/A |
+
 ## Gotchas
 
 - `src/html/` contains standalone HTML files, NOT VitePress markdown — don't add routable content there
