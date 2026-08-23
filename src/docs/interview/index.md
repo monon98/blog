@@ -21,6 +21,8 @@
 - [Node.js](./16.%20nodejs/)
 - [Express](./17.%20express/)
 - [React](./18.%20react/)
+- [Webpack](./99.%20webpack/)
+- [Vite](./98.%20vite/)
 - [Web3基础](./21.%20web3基础)
 - [BTC](./22.%20btc)
 - [ETH](./23.%20eth)
