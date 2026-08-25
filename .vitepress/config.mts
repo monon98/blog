@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitepress';
-import { nav } from './nav';
-import { sidebar } from './sidebar';
+import { nav } from './nav.ts';
+import { sidebar } from './sidebar.ts';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -31,6 +31,9 @@ export default defineConfig({
   outDir: './dist',
   lastUpdated: true,
   vite: {
+    build: {
+      cssMinify: 'esbuild',
+    },
     resolve: {
       alias: {
         '@': '/',

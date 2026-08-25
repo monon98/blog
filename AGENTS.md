@@ -17,7 +17,8 @@ No lint, typecheck, or test scripts exist. Do not add code quality tooling unles
 
 ## Architecture
 
-- **Framework**: VitePress 1.6.x, configured in `.vitepress/config.mts`
+- **Framework**: VitePress 2.0.0-alpha.19 (Vite 8 + Rolldown), configured in `.vitepress/config.mts`
+- **CSS minify**: `esbuild`（config 中显式指定，绕过 lightningcss 对主题样式的压缩报错）
 - **Source dir**: `src/` (not root). Content lives in `src/docs/`
 - **Output dir**: `dist/`
 - **Base path**: `/blog/` — all generated URLs are prefixed with this
