@@ -12,7 +12,7 @@
 - [TypeScript](./03.%20typescript/)
 - [Vue](./05.%20vue/)
 - [Browser](./06.%20browser/)
-- [HTML5](./07.%20h5)
+- [HTML5](./07.%20h5/)
 - [Nuxt](./09.%20nuxt/)
 - [Electron](./10.%20electron/)
 - [Three.js](./11.%20threejs/)
