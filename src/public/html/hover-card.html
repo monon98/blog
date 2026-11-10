@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>悬浮卡片</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 24px;
+    }
+
+    .card {
+      width: 220px;
+      padding: 24px;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-10px) scale(1.03);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .card .avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      margin-bottom: 16px;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: #1f2430;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="avatar"></div>
+    <h3>悬浮卡片</h3>
+    <p>将鼠标移到卡片上，观察上浮与放大的过渡效果。</p>
+  </div>
+
+  <div class="card">
+    <div class="avatar" style="background: linear-gradient(135deg, #4facfe, #00f2fe);"></div>
+    <h3>纯原生实现</h3>
+    <p>单文件自包含，无外部依赖，可直接被 iframe 内嵌展示。</p>
+  </div>
+
+  <script>
+    // 自包含脚本示例：点击卡片打印日志
+    document.querySelectorAll('.card').forEach(function (card, i) {
+      card.addEventListener('click', function () {
+        console.log('点击了第 ' + (i + 1) + ' 张卡片');
+      });
+    });
+  </script>
+</body>
+</html>

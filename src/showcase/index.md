@@ -24,6 +24,8 @@ sidebar: false
 
 <HoverButton :icon="icon" text="hover me" />
 
+5. [html-frame 原生 HTML 内嵌](./html-frame) iframe 内嵌 `src/public/html/` 下的原生 HTML 案例
+
 <script setup>
 import Snowflakes from '@components/snowflakes.vue';
 import RandomScroll from '@components/random-scroll.vue';

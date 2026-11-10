@@ -45,6 +45,8 @@ import Info from '@components/info.vue'
 
 `src/html/` files are standalone — they do not go through VitePress routing. They can reference components via `<script>` tags but are not part of the built site navigation.
 
+> 要把原生 HTML 以 iframe 内嵌到展示页（线上可用），HTML 必须放 `src/public/html/` 并用 `HtmlFrame` 组件内嵌。完整规范与模板见 `demo-showcase` skill。
+
 ## Conventions
 
 - Use Vue 3 `<script setup>` syntax
