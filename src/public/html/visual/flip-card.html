@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D 翻转卡片</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 24px;
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #0f172a 100%);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #e2e8f0;
+    }
+
+    .hint { margin: 0; font-size: 13px; color: #a5b4fc; }
+
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      justify-content: center;
+      perspective: 1200px;
+    }
+
+    .card {
+      width: 220px;
+      height: 290px;
+      cursor: pointer;
+      /* 关键：建立 3D 上下文，让子元素保留立体空间 */
+      transform-style: preserve-3d;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card.flipped { transform: rotateY(180deg); }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 18px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .front {
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(6px);
+    }
+
+    .front .icon { font-size: 44px; margin-bottom: 14px; }
+    .front h3 { margin: 0 0 6px; font-size: 18px; }
+    .front span { font-size: 12px; color: #c7d2fe; }
+
+    .back {
+      transform: rotateY(180deg);
+      background: linear-gradient(160deg, #6366f1, #a855f7);
+      color: #fff;
+    }
+
+    .back h3 { margin: 0 0 10px; font-size: 17px; }
+    .back p { margin: 0; font-size: 13px; line-height: 1.7; opacity: 0.95; }
+
+    @media (max-width: 520px) {
+      .card { width: 170px; height: 240px; }
+      .front .icon { font-size: 34px; }
+      .front h3 { font-size: 15px; }
+      .back p { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <p class="hint">点击卡片翻转（transform-style: preserve-3d + backface-visibility）</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="face front">
+        <div class="icon">🎨</div>
+        <h3>正面</h3>
+        <span>点击翻到背面</span>
+      </div>
+      <div class="face back">
+        <h3>背面内容</h3>
+        <p>两个面都通过 backface-visibility: hidden 隐藏背向视图的一面，避免透叠。</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="face front">
+        <div class="icon">🧊</div>
+        <h3>玻璃拟态</h3>
+        <span>点击翻到背面</span>
+      </div>
+      <div class="face back">
+        <h3>3D 上下文</h3>
+        <p>父容器设置 transform-style: preserve-3d，子元素的 rotateY 才不会被压平成 2D。</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="face front">
+        <div class="icon">⚡</div>
+        <h3>平滑过渡</h3>
+        <span>点击翻到背面</span>
+      </div>
+      <div class="face back">
+        <h3>缓动曲线</h3>
+        <p>transition 作用于 transform，一次 rotateY(180deg) 即可完成整卡翻转动画。</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.card').forEach(function (card) {
+      card.addEventListener('click', function () {
+        card.classList.toggle('flipped');
+      });
+    });
+  </script>
+</body>
+</html>

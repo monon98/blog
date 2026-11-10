@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>波浪 / 液体进度条</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 24px;
+      background: #0f172a;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #e2e8f0;
+    }
+
+    h1 { font-size: 17px; margin: 0; }
+    .sub { font-size: 12px; color: #64748b; margin: -10px 0 0; }
+
+    .gauge {
+      position: relative;
+      width: 240px;
+      height: 240px;
+    }
+
+    svg { display: block; width: 100%; height: 100%; transform: rotate(-90deg); }
+
+    .ring-bg { fill: none; stroke: #1e293b; stroke-width: 14; }
+
+    .ring-fg {
+      fill: none;
+      stroke: url(#grad);
+      stroke-width: 14;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.4s ease;
+    }
+
+    .label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transform: rotate(0deg);
+    }
+
+    .pct {
+      font-size: 46px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .label small { font-size: 12px; color: #64748b; margin-top: 2px; }
+
+    /* 液体容器 */
+    .liquid {
+      position: relative;
+      width: 240px;
+      height: 130px;
+      border: 3px solid #334155;
+      border-top: none;
+      border-radius: 0 0 22px 22px;
+      overflow: hidden;
+      background: #0b1220;
+    }
+
+    .liquid-fill {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 50%;
+      background: linear-gradient(180deg, #22d3ee, #6366f1);
+      transition: height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 波浪用两层伪元素正弦位移 */
+    .liquid-fill::before,
+    .liquid-fill::after {
+      content: "";
+      position: absolute;
+      top: -18px;
+      left: -100%;
+      width: 300%;
+      height: 22px;
+      background-repeat: repeat-x;
+      background-size: 50% 100%;
+      background-image: radial-gradient(circle at 25% 100%, transparent 74%, #22d3ee 76%, #22d3ee 100%),
+                        radial-gradient(circle at 75% 100%, transparent 74%, #22d3ee 76%, #22d3ee 100%);
+      animation: wave 3s linear infinite;
+      opacity: 0.9;
+    }
+
+    .liquid-fill::after {
+      top: -14px;
+      animation-duration: 4.5s;
+      animation-direction: reverse;
+      opacity: 0.55;
+      filter: hue-rotate(30deg);
+    }
+
+    @keyframes wave {
+      from { transform: translateX(0); }
+      to   { transform: translateX(33.33%); }
+    }
+
+    .ctrl {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 340px;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    input[type="range"] { flex: 1; accent-color: #38bdf8; }
+    .val { font-variant-numeric: tabular-nums; color: #e2e8f0; min-width: 46px; text-align: right; }
+  </style>
+</head>
+<body>
+  <h1>波浪 / 液体进度条</h1>
+  <p class="sub">SVG 环形进度 + CSS 液面波动，均随进度实时变化</p>
+
+  <div class="gauge">
+    <svg viewBox="0 0 200 200">
+      <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#38bdf8" />
+          <stop offset="100%" stop-color="#818cf8" />
+        </linearGradient>
+      </defs>
+      <circle class="ring-bg" cx="100" cy="100" r="86" />
+      <circle class="ring-fg" id="ring" cx="100" cy="100" r="86"
+              stroke-dasharray="540.35" stroke-dashoffset="270" />
+    </svg>
+    <div class="label">
+      <div class="pct" id="pct">50%</div>
+      <small>SVG stroke-dashoffset</small>
+    </div>
+  </div>
+
+  <div class="liquid">
+    <div class="liquid-fill" id="fill"></div>
+  </div>
+
+  <div class="ctrl">
+    <span>进度</span>
+    <input type="range" id="range" min="0" max="100" value="50" />
+    <span class="val" id="val">50%</span>
+  </div>
+
+  <script>
+    var R = 86;
+    var CIRC = 2 * Math.PI * R;   // ≈ 540.35
+    var ring = document.getElementById('ring');
+    var fill = document.getElementById('fill');
+    var pct = document.getElementById('pct');
+    var val = document.getElementById('val');
+    var range = document.getElementById('range');
+
+    ring.setAttribute('stroke-dasharray', CIRC.toFixed(2));
+
+    function render(p) {
+      ring.setAttribute('stroke-dashoffset', (CIRC * (1 - p / 100)).toFixed(2));
+      fill.style.height = p + '%';
+      pct.textContent = p + '%';
+      val.textContent = p + '%';
+    }
+
+    range.addEventListener('input', function () {
+      render(Number(range.value));
+    });
+
+    // 演示：加载时从 0 动画到初始值
+    var target = Number(range.value);
+    var cur = 0;
+    var timer = setInterval(function () {
+      cur += 2;
+      if (cur >= target) { cur = target; clearInterval(timer); }
+      render(cur);
+    }, 16);
+
+    render(0);
+  </script>
+</body>
+</html>

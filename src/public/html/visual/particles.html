@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>鼠标跟随粒子 / 烟花</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #05060f;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+    }
+
+    .hint {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #94a3b8;
+      font-size: 12px;
+      letter-spacing: 1px;
+      pointer-events: none;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="hint">移动鼠标产生拖尾 · 点击绽放烟花</div>
+  <canvas id="c"></canvas>
+
+  <script>
+    var canvas = document.getElementById('c');
+    var ctx = canvas.getContext('2d');
+    var W, H;
+    var particles = [];
+    var mouse = { x: -999, y: -999, px: -999, py: -999 };
+
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    var COLORS = ['#60a5fa', '#a78bfa', '#f472b6', '#34d399', '#fbbf24', '#22d3ee'];
+
+    function Particle(x, y, vx, vy, life, size, color) {
+      this.x = x; this.y = y;
+      this.vx = vx; this.vy = vy;
+      this.life = life; this.maxLife = life;
+      this.size = size; this.color = color;
+    }
+
+    Particle.prototype.update = function () {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.vy += 0.045;          // 重力
+      this.vx *= 0.985;          // 阻尼
+      this.vy *= 0.985;
+      this.life -= 1;
+    };
+
+    Particle.prototype.draw = function () {
+      var alpha = Math.max(0, this.life / this.maxLife);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = this.color;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size * alpha, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    };
+
+    // 鼠标拖尾
+    function trail(x, y, vx, vy) {
+      for (var i = 0; i < 3; i++) {
+        particles.push(new Particle(
+          x + (Math.random() - 0.5) * 6,
+          y + (Math.random() - 0.5) * 6,
+          vx * 0.12 + (Math.random() - 0.5) * 1.4,
+          vy * 0.12 + (Math.random() - 0.5) * 1.4,
+          40 + Math.random() * 25,
+          2.4,
+          COLORS[(Math.random() * COLORS.length) | 0]
+        ));
+      }
+    }
+
+    // 烟花爆炸
+    function burst(x, y) {
+      var n = 70 + ((Math.random() * 50) | 0);
+      var color = COLORS[(Math.random() * COLORS.length) | 0];
+      for (var i = 0; i < n; i++) {
+        var angle = (Math.PI * 2 * i) / n;
+        var speed = 1.6 + Math.random() * 4.6;
+        particles.push(new Particle(
+          x, y,
+          Math.cos(angle) * speed,
+          Math.sin(angle) * speed,
+          60 + Math.random() * 40,
+          2.6,
+          Math.random() > 0.35 ? color : COLORS[(Math.random() * COLORS.length) | 0]
+        ));
+      }
+    }
+
+    canvas.addEventListener('mousemove', function (e) {
+      mouse.px = mouse.x; mouse.py = mouse.y;
+      mouse.x = e.clientX; mouse.y = e.clientY;
+      if (mouse.px > -900) {
+        trail(mouse.x, mouse.y, mouse.x - mouse.px, mouse.y - mouse.py);
+      }
+    });
+
+    canvas.addEventListener('mouseleave', function () {
+      mouse.x = mouse.y = -999;
+    });
+
+    canvas.addEventListener('click', function (e) {
+      burst(e.clientX, e.clientY);
+    });
+
+    function loop() {
+      // 半透明填充形成拖尾
+      ctx.fillStyle = 'rgba(5, 6, 15, 0.22)';
+      ctx.fillRect(0, 0, W, H);
+
+      for (var i = particles.length - 1; i >= 0; i--) {
+        var p = particles[i];
+        p.update();
+        p.draw();
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+
+      // 粒子过多时兜底清理
+      if (particles.length > 1200) particles.splice(0, particles.length - 1200);
+
+      requestAnimationFrame(loop);
+    }
+
+    loop();
+  </script>
+</body>
+</html>

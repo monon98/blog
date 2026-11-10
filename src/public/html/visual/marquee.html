@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>无限轮播 / 跑马灯</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #0f172a;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      align-items: center;
+    }
+
+    h1 { font-size: 17px; margin: 0; }
+    .sub { font-size: 12px; color: #64748b; margin: -14px 0 0; }
+
+    .block {
+      width: 100%;
+      max-width: 720px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .block h2 {
+      font-size: 13px;
+      margin: 0 0 12px;
+      color: #94a3b8;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+
+    /* ---- 横向无缝跑马灯 ---- */
+    .marquee {
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    }
+
+    .track {
+      display: flex;
+      gap: 12px;
+      width: max-content;
+      animation: scrollX 22s linear infinite;
+    }
+
+    .marquee:hover .track { animation-play-state: paused; }
+
+    .track.reverse { animation-direction: reverse; animation-duration: 28s; }
+
+    @keyframes scrollX {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }   /* 内容复制两份，位移一半即无缝 */
+    }
+
+    .chip {
+      flex: 0 0 auto;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-size: 14px;
+      white-space: nowrap;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(56, 189, 248, 0.35));
+      border: 1px solid rgba(129, 140, 248, 0.45);
+      color: #e0e7ff;
+    }
+
+    .chip.alt {
+      background: linear-gradient(135deg, rgba(244, 114, 182, 0.3), rgba(251, 146, 60, 0.3));
+      border-color: rgba(251, 146, 60, 0.45);
+      color: #ffe4e6;
+    }
+
+    /* ---- 纵向滚动列表 ---- */
+    .vscroll {
+      height: 150px;
+      overflow: hidden;
+      position: relative;
+      -webkit-mask-image: linear-gradient(180deg, transparent, #000 12%, #000 88%, transparent);
+      mask-image: linear-gradient(180deg, transparent, #000 12%, #000 88%, transparent);
+    }
+
+    .vtrack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      animation: scrollY 16s linear infinite;
+    }
+
+    @keyframes scrollY {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-50%); }
+    }
+
+    .vitem {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 14px;
+      border-radius: 8px;
+      background: rgba(148, 163, 184, 0.12);
+      font-size: 13px;
+    }
+
+    .vitem b { color: #38bdf8; font-weight: 600; }
+
+    /* ---- 跑马灯文字 ---- */
+    .text-run {
+      overflow: hidden;
+      white-space: nowrap;
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #a5b4fc, #22d3ee, #a5b4fc);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: shine 6s linear infinite;
+    }
+
+    .text-run span {
+      display: inline-block;
+      padding-right: 60px;
+      animation: scrollX 14s linear infinite;
+    }
+
+    @keyframes shine {
+      from { background-position: 0% 0; }
+      to   { background-position: 200% 0; }
+    }
+  </style>
+</head>
+<body>
+  <h1>无限轮播 / 跑马灯</h1>
+  <p class="sub">内容复制两份 + translateX(-50%) 实现无缝循环，悬停暂停</p>
+
+  <div class="block">
+    <h2>横向无缝跑马灯（悬停暂停）</h2>
+    <div class="marquee">
+      <div class="track">
+        <span class="chip">Vue 3</span><span class="chip alt">VitePress</span>
+        <span class="chip">TypeScript</span><span class="chip alt">CSS Houdini</span>
+        <span class="chip">Web Components</span><span class="chip alt">Canvas</span>
+        <span class="chip">WebGL</span><span class="chip alt">Performance</span>
+        <!-- 复制一份，形成无缝 -->
+        <span class="chip">Vue 3</span><span class="chip alt">VitePress</span>
+        <span class="chip">TypeScript</span><span class="chip alt">CSS Houdini</span>
+        <span class="chip">Web Components</span><span class="chip alt">Canvas</span>
+        <span class="chip">WebGL</span><span class="chip alt">Performance</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>反向跑马灯</h2>
+    <div class="marquee">
+      <div class="track reverse">
+        <span class="chip alt">🔥 热门</span><span class="chip">📦 新发布</span>
+        <span class="chip alt">🎯 精选</span><span class="chip">💡 技巧</span>
+        <span class="chip alt">🚀 性能</span><span class="chip">🧩 架构</span>
+        <span class="chip alt">🔥 热门</span><span class="chip">📦 新发布</span>
+        <span class="chip alt">🎯 精选</span><span class="chip">💡 技巧</span>
+        <span class="chip alt">🚀 性能</span><span class="chip">🧩 架构</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>纵向无限滚动</h2>
+    <div class="vscroll">
+      <div class="vtrack">
+        <div class="vitem"><span>构建耗时</span><b>-42%</b></div>
+        <div class="vitem"><span>首屏时间</span><b>0.8s</b></div>
+        <div class="vitem"><span>包体积</span><b>-31%</b></div>
+        <div class="vitem"><span>Lighthouse</span><b>98</b></div>
+        <div class="vitem"><span>内存占用</span><b>-27%</b></div>
+        <!-- 复制一份 -->
+        <div class="vitem"><span>构建耗时</span><b>-42%</b></div>
+        <div class="vitem"><span>首屏时间</span><b>0.8s</b></div>
+        <div class="vitem"><span>包体积</span><b>-31%</b></div>
+        <div class="vitem"><span>Lighthouse</span><b>98</b></div>
+        <div class="vitem"><span>内存占用</span><b>-27%</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>渐变文字跑马灯</h2>
+    <div class="text-run">
+      <span>前端特效案例 · 可直接复制到你的项目 · 前端特效案例 · 可直接复制到你的项目 · </span>
+    </div>
+  </div>
+</body>
+</html>

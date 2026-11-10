@@ -28,6 +28,8 @@ sidebar: false
 
 6. [第一组 · 与已有文章联动](./article) 扩展卡片 / visibilitychange / BFC / 盒模型 / CSS 选择器
 
+7. [第二组 · 纯视觉特效](./visual) 视差 / 粒子 / 翻转 / 波浪 / 跑马灯 / 频谱 / 打字机 / 磁吸等 11 个案例
+
 <script setup>
 import Snowflakes from '@components/snowflakes.vue';
 import RandomScroll from '@components/random-scroll.vue';

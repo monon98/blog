@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>视差滚动</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow-y: auto;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #0b1120;
+      color: #e2e8f0;
+      scroll-behavior: smooth;
+    }
+
+    /* 远景星空层，滚动最慢 */
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(1px 1px at 20% 30%, #fff, transparent),
+        radial-gradient(1px 1px at 70% 60%, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 40% 80%, #cbd5e1, transparent),
+        radial-gradient(1px 1px at 85% 20%, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 10% 70%, #94a3b8, transparent),
+        radial-gradient(1px 1px at 55% 15%, #fff, transparent);
+      background-size: 400px 400px, 500px 500px, 600px 600px, 450px 450px, 550px 550px, 700px 700px;
+      opacity: 0.6;
+      will-change: transform;
+    }
+
+    /* 中景浮动形状 */
+    .shapes {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      will-change: transform;
+    }
+
+    .shape {
+      position: absolute;
+      border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+      opacity: 0.35;
+      filter: blur(1px);
+      will-change: transform;
+    }
+
+    .s1 { width: 160px; height: 160px; left: 8%;  top: 20%; background: #6366f1; }
+    .s2 { width: 120px; height: 120px; right: 12%; top: 45%; background: #06b6d4; }
+    .s3 { width: 200px; height: 200px; left: 55%; top: 75%; background: #8b5cf6; opacity: 0.25; }
+    .s4 { width: 90px;  height: 90px;  left: 25%; top: 65%; background: #f472b6; }
+
+    /* 前景内容 */
+    .section {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 24px;
+      will-change: transform;
+    }
+
+    .section .kicker {
+      font-size: 12px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #67e8f9;
+      margin-bottom: 12px;
+    }
+
+    .section h2 {
+      font-size: clamp(28px, 5vw, 46px);
+      margin: 0 0 16px;
+      background: linear-gradient(90deg, #a5b4fc, #67e8f9);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .section p {
+      max-width: 520px;
+      font-size: 15px;
+      line-height: 1.9;
+      color: #94a3b8;
+      margin: 0;
+    }
+
+    .scroll-hint {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      font-size: 12px;
+      color: #64748b;
+      animation: bob 1.6s ease-in-out infinite;
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translate(-50%, 0); }
+      50% { transform: translate(-50%, 6px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" data-speed="0.15"></div>
+
+  <div class="shapes">
+    <div class="shape s1" data-speed="0.35"></div>
+    <div class="shape s2" data-speed="0.55"></div>
+    <div class="shape s3" data-speed="0.25"></div>
+    <div class="shape s4" data-speed="0.7"></div>
+  </div>
+
+  <section class="section" data-speed="0.5">
+    <div class="kicker">Parallax</div>
+    <h2>远景 · 缓慢移动</h2>
+    <p>星空层的滚动速度系数为 0.15，几乎静止，营造纵深感。每一层通过 data-speed 声明自己的视差速率。</p>
+  </section>
+
+  <section class="section" data-speed="0.25">
+    <div class="kicker">Parallax</div>
+    <h2>中景 · 错落浮动</h2>
+    <p>四个不规则形状以 0.25 ~ 0.7 的不同速率移动，产生相对位移差，这就是视差滚动的核心原理。</p>
+  </section>
+
+  <section class="section" data-speed="0">
+    <div class="kicker">Parallax</div>
+    <h2>前景 · 保持稳定</h2>
+    <p>主要文字内容几乎不位移，保证可读性。所有位移只写 transform，由合成器完成，滚动依然流畅。</p>
+  </section>
+
+  <div class="scroll-hint">↓ 在区域内滚动查看</div>
+
+  <script>
+    var layers = document.querySelectorAll('[data-speed]');
+    var ticking = false;
+
+    function update() {
+      var y = window.scrollY || window.pageYOffset;
+      layers.forEach(function (el) {
+        var speed = parseFloat(el.dataset.speed) || 0;
+        el.style.transform = 'translate3d(0,' + (y * speed) + 'px,0)';
+      });
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', function () {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    }, { passive: true });
+
+    update();
+  </script>
+</body>
+</html>

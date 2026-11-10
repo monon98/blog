@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>倒计时翻页时钟</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 24px;
+      background: linear-gradient(160deg, #111827, #1f2937 60%, #0f172a);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #e5e7eb;
+    }
+
+    h1 { font-size: 17px; margin: 0; font-weight: 600; }
+    .sub { font-size: 12px; color: #6b7280; margin: -16px 0 0; }
+
+    .clock {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .unit { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+    .digits { display: flex; gap: 6px; }
+
+    .digit {
+      position: relative;
+      width: 62px;
+      height: 88px;
+      perspective: 400px;
+      font-size: 46px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .digit::before {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; top: 50%;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 3;
+    }
+
+    .digit .val {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #374151 0%, #374151 49.9%, #1f2937 50%, #1f2937 100%);
+      border-radius: 8px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      transform-origin: center;
+      backface-visibility: hidden;
+    }
+
+    .digit.flip-out .val { animation: flipOut 0.3s ease-in forwards; }
+    .digit.flip-in .val  { animation: flipIn 0.3s ease-out forwards; }
+
+    @keyframes flipOut {
+      from { transform: rotateX(0deg); }
+      to   { transform: rotateX(-90deg); }
+    }
+
+    @keyframes flipIn {
+      from { transform: rotateX(90deg); }
+      to   { transform: rotateX(0deg); }
+    }
+
+    .unit .cap {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: #9ca3af;
+      text-transform: uppercase;
+    }
+
+    .sep {
+      font-size: 42px;
+      font-weight: 700;
+      color: #6b7280;
+      padding-bottom: 26px;
+      animation: blink 1s steps(1) infinite;
+    }
+
+    @keyframes blink { 50% { opacity: 0.25; } }
+
+    .ctrl { display: flex; gap: 10px; }
+
+    .ctrl button {
+      padding: 9px 22px;
+      border: 1px solid #4b5563;
+      border-radius: 8px;
+      background: #1f2937;
+      color: #e5e7eb;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ctrl button:hover { background: #374151; border-color: #6b7280; }
+    .ctrl button.primary { background: #2563eb; border-color: #2563eb; }
+    .ctrl button.primary:hover { background: #1d4ed8; }
+
+    .done { color: #f87171; }
+  </style>
+</head>
+  <body>
+    <h1>倒计时翻页时钟</h1>
+    <p class="sub">数字变化时触发 rotateX 翻页动画</p>
+
+    <div class="clock" id="clock">
+      <div class="unit">
+        <div class="digits">
+          <div class="digit" id="m1"><span class="val">0</span></div>
+          <div class="digit" id="m2"><span class="val">0</span></div>
+        </div>
+        <div class="cap">Minutes</div>
+      </div>
+
+      <div class="sep">:</div>
+
+      <div class="unit">
+        <div class="digits">
+          <div class="digit" id="s1"><span class="val">0</span></div>
+          <div class="digit" id="s2"><span class="val">0</span></div>
+        </div>
+        <div class="cap">Seconds</div>
+      </div>
+    </div>
+
+    <div class="ctrl">
+      <button class="primary" id="toggle">开始</button>
+      <button id="reset">重置</button>
+      <button id="plus">+30s</button>
+    </div>
+
+  <script>
+    var TOTAL = 300;            // 默认 5 分钟
+    var left = TOTAL;
+    var running = false;
+    var timer = null;
+
+    var cells = {
+      m1: document.getElementById('m1'),
+      m2: document.getElementById('m2'),
+      s1: document.getElementById('s1'),
+      s2: document.getElementById('s2')
+    };
+    var toggleBtn = document.getElementById('toggle');
+
+    function setDigit(cell, next) {
+      var valEl = cell.querySelector('.val');
+      if (valEl.textContent === String(next)) return;
+
+      cell.classList.remove('flip-in');
+      cell.classList.add('flip-out');
+
+      setTimeout(function () {
+        valEl.textContent = next;
+        cell.classList.remove('flip-out');
+        cell.classList.add('flip-in');
+      }, 300);
+    }
+
+    function render() {
+      var m = Math.floor(left / 60);
+      var s = left % 60;
+      var mm = String(m).padStart(2, '0');
+      var ss = String(s).padStart(2, '0');
+
+      setDigit(cells.m1, mm[0]);
+      setDigit(cells.m2, mm[1]);
+      setDigit(cells.s1, ss[0]);
+      setDigit(cells.s2, ss[1]);
+
+      document.getElementById('clock').classList.toggle('done', left === 0);
+    }
+
+    function tick() {
+      if (left <= 0) { stop(); return; }
+      left -= 1;
+      render();
+      if (left === 0) stop();
+    }
+
+    function start() {
+      if (running || left === 0) return;
+      running = true;
+      timer = setInterval(tick, 1000);
+      toggleBtn.textContent = '暂停';
+    }
+
+    function stop() {
+      running = false;
+      clearInterval(timer);
+      toggleBtn.textContent = left === 0 ? '已结束' : '开始';
+    }
+
+    toggleBtn.addEventListener('click', function () {
+      running ? stop() : start();
+    });
+
+    document.getElementById('reset').addEventListener('click', function () {
+      stop();
+      left = TOTAL;
+      toggleBtn.textContent = '开始';
+      render();
+    });
+
+    document.getElementById('plus').addEventListener('click', function () {
+      left += 30;
+      toggleBtn.textContent = running ? '暂停' : '开始';
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

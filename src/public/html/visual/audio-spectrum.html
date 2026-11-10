@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>音频频谱可视化</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #05060f;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #e2e8f0;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .hud {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 999px;
+      padding: 8px 14px;
+      backdrop-filter: blur(8px);
+      z-index: 2;
+    }
+
+    .hud button {
+      padding: 6px 18px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #6366f1, #22d3ee);
+      color: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      transition: filter 0.2s, transform 0.1s;
+    }
+
+    .hud button:hover { filter: brightness(1.15); }
+    .hud button:active { transform: scale(0.95); }
+
+    .hud .state { font-size: 12px; color: #94a3b8; min-width: 74px; }
+    .hud .note  { font-size: 12px; color: #67e8f9; font-variant-numeric: tabular-nums; }
+
+    .tip {
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: #64748b;
+      z-index: 2;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="hud">
+    <button id="btn">▶ 播放</button>
+    <span class="state" id="state">已停止</span>
+    <span class="note" id="note">—</span>
+  </div>
+
+  <div class="tip">Web Audio API 合成音序 + AnalyserNode 实时频谱（无外部音频文件）</div>
+
+  <canvas id="c"></canvas>
+
+  <script>
+    var canvas = document.getElementById('c');
+    var ctx2d = canvas.getContext('2d');
+    var W, H;
+
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // ---------- 音频 ----------
+    var actx = null, analyser, master;
+    var playing = false;
+    var step = 0;
+    var nextTime = 0;
+    var scheduler = null;
+
+    var TEMPO = 132;                 // BPM
+    var STEP_DUR = 60 / TEMPO / 2;   // 八分音符
+    var BASE = 174.61;               // F3
+
+    // 小调五声音阶，循环生成旋律
+    var SCALE = [0, 3, 5, 7, 10, 12, 10, 7, 5, 3, 0, 5, 7, 12, 10, 7];
+    var NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+    function initAudio() {
+      if (actx) return;
+      var AC = window.AudioContext || window.webkitAudioContext;
+      actx = new AC();
+      master = actx.createGain();
+      master.gain.value = 0.35;
+      analyser = actx.createAnalyser();
+      analyser.fftSize = 512;
+      analyser.smoothingTimeConstant = 0.8;
+      master.connect(analyser);
+      analyser.connect(actx.destination);
+    }
+
+    function noteFreq(semitone) {
+      return BASE * Math.pow(2, semitone / 12);
+    }
+
+    function scheduleNote(time, freq, dur) {
+      var osc = actx.createOscillator();
+      var gain = actx.createGain();
+      var filter = actx.createBiquadFilter();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, time);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(2600, time);
+      filter.frequency.exponentialRampToValueAtTime(500, time + dur);
+
+      gain.gain.setValueAtTime(0.0001, time);
+      gain.gain.exponentialRampToValueAtTime(0.7, time + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(master);
+
+      osc.start(time);
+      osc.stop(time + dur + 0.05);
+    }
+
+    function schedulerTick() {
+      while (nextTime < actx.currentTime + 0.12) {
+        var semi = SCALE[step % SCALE.length];
+        scheduleNote(nextTime, noteFreq(semi), STEP_DUR * 1.6);
+
+        // 每 4 步加一个低音
+        if (step % 4 === 0) {
+          scheduleNote(nextTime, noteFreq(semi - 12), STEP_DUR * 3.2);
+        }
+
+        var octave = Math.floor((step % 16) / 8);
+        var n = ((semi + 12 * octave) % 12);
+        document.getElementById('note').textContent = NAMES[n] + (4 + octave) + ' · ' + (step + 1);
+
+        nextTime += STEP_DUR;
+        step++;
+      }
+    }
+
+    function start() {
+      initAudio();
+      if (actx.state === 'suspended') actx.resume();
+      if (playing) return;
+      playing = true;
+      step = 0;
+      nextTime = actx.currentTime + 0.08;
+      scheduler = setInterval(schedulerTick, 25);
+      document.getElementById('btn').textContent = '⏸ 暂停';
+      document.getElementById('state').textContent = '播放中 ' + TEMPO + ' BPM';
+    }
+
+    function stop() {
+      playing = false;
+      clearInterval(scheduler);
+      document.getElementById('btn').textContent = '▶ 播放';
+      document.getElementById('state').textContent = '已停止';
+      document.getElementById('note').textContent = '—';
+    }
+
+    document.getElementById('btn').addEventListener('click', function () {
+      playing ? stop() : start();
+    });
+
+    // ---------- 可视化 ----------
+    var freqData, timeData;
+
+    function drawIdle(t) {
+      // 未播放时画一条呼吸的基准线
+      ctx2d.fillStyle = 'rgba(5, 6, 15, 0.35)';
+      ctx2d.fillRect(0, 0, W, H);
+      ctx2d.strokeStyle = 'rgba(99, 102, 241, 0.5)';
+      ctx2d.lineWidth = 2;
+      ctx2d.beginPath();
+      for (var x = 0; x <= W; x += 6) {
+        var y = H / 2 + Math.sin(x * 0.02 + t * 0.002) * 14 * Math.sin(t * 0.001);
+        x === 0 ? ctx2d.moveTo(x, y) : ctx2d.lineTo(x, y);
+      }
+      ctx2d.stroke();
+    }
+
+    function draw(t) {
+      if (!analyser || !playing) { drawIdle(t); requestAnimationFrame(draw); return; }
+
+      if (!freqData) {
+        freqData = new Uint8Array(analyser.frequencyBinCount);
+        timeData = new Uint8Array(analyser.fftSize);
+      }
+
+      analyser.getByteFrequencyData(freqData);
+      analyser.getByteTimeDomainData(timeData);
+
+      // 背景拖尾
+      ctx2d.fillStyle = 'rgba(5, 6, 15, 0.28)';
+      ctx2d.fillRect(0, 0, W, H);
+
+      // 频谱柱
+      var bars = 72;
+      var gap = 3;
+      var barW = (W - gap * (bars - 1)) / bars;
+      var gradient = ctx2d.createLinearGradient(0, H, 0, 0);
+      gradient.addColorStop(0, '#6366f1');
+      gradient.addColorStop(0.55, '#22d3ee');
+      gradient.addColorStop(1, '#f472b6');
+
+      ctx2d.fillStyle = gradient;
+      for (var i = 0; i < bars; i++) {
+        // 对数取样，让低频段更明显
+        var idx = Math.floor(Math.pow(i / bars, 1.7) * (freqData.length - 1));
+        var v = freqData[idx] / 255;
+        var h = Math.max(3, v * (H * 0.72));
+        var x = i * (barW + gap);
+        var y = H - h;
+        ctx2d.fillRect(x, y, barW, h);
+
+        // 顶部高光
+        ctx2d.fillStyle = 'rgba(255,255,255,0.85)';
+        ctx2d.fillRect(x, y - 3, barW, 2);
+        ctx2d.fillStyle = gradient;
+      }
+
+      // 波形叠加
+      ctx2d.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+      ctx2d.lineWidth = 1.5;
+      ctx2d.beginPath();
+      var slice = W / timeData.length;
+      for (var j = 0; j < timeData.length; j++) {
+        var wy = (timeData[j] / 128) * (H * 0.5);
+        j === 0 ? ctx2d.moveTo(0, wy) : ctx2d.lineTo(j * slice, wy);
+      }
+      ctx2d.stroke();
+
+      requestAnimationFrame(draw);
+    }
+
+    requestAnimationFrame(draw);
+  </script>
+</body>
+</html>
