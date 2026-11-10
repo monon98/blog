@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Promise 链式调用演示</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #0f172a;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    h1 { font-size: 17px; margin: 0; }
+    .sub { font-size: 12px; color: #64748b; margin: -12px 0 0; }
+
+    .ctrl { display: flex; gap: 10px; }
+
+    .ctrl button {
+      padding: 9px 22px;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ctrl button:hover { background: #334155; }
+    .ctrl button.ok { background: #16a34a; border-color: #16a34a; color: #fff; }
+    .ctrl button.ok:hover { background: #15803d; }
+    .ctrl button.err { background: #dc2626; border-color: #dc2626; color: #fff; }
+    .ctrl button.err:hover { background: #b91c1c; }
+
+    .chain {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .step {
+      position: relative;
+      padding: 13px 16px;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      background: #1e293b;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 13px;
+      color: #94a3b8;
+      transition: all 0.35s ease;
+      opacity: 0.55;
+    }
+
+    .step + .step { margin-top: 22px; }
+
+    /* 连接线 */
+    .step + .step::before {
+      content: "";
+      position: absolute;
+      left: 26px;
+      top: -22px;
+      width: 2px;
+      height: 22px;
+      background: #334155;
+      transition: background 0.35s;
+    }
+
+    .step .code { display: block; color: #cbd5e1; }
+    .step .desc {
+      display: block;
+      margin-top: 5px;
+      font-family: system-ui, sans-serif;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .step .state {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: #334155;
+      color: #94a3b8;
+      font-family: system-ui, sans-serif;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    /* 当前执行 */
+    .step.active {
+      opacity: 1;
+      border-color: #fbbf24;
+      background: rgba(251, 191, 36, 0.12);
+      color: #fde68a;
+      box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.15);
+    }
+
+    .step.active .state { opacity: 1; background: #fbbf24; color: #422006; }
+    .step.active + .step::before,
+    .step.done + .step::before { background: #22c55e; }
+
+    /* 已完成 */
+    .step.done {
+      opacity: 1;
+      border-color: #16a34a;
+      background: rgba(22, 163, 74, 0.1);
+      color: #86efac;
+    }
+
+    .step.done .state { opacity: 1; background: #16a34a; color: #052e16; }
+
+    /* 被跳过（reject 时非 catch 步骤） */
+    .step.skipped {
+      opacity: 0.3;
+      border-style: dashed;
+      text-decoration: line-through;
+    }
+
+    .step.skipped .state { opacity: 1; background: #7f1d1d; color: #fecaca; }
+
+    /* catch 步骤专属 */
+    .step.catch-step {
+      border-color: #7f1d1d;
+      background: rgba(220, 38, 38, 0.08);
+    }
+
+    .step.catch-step.done { border-color: #dc2626; background: rgba(220, 38, 38, 0.15); color: #fca5a5; }
+    .step.catch-step.done .state { background: #dc2626; color: #fff; }
+
+    /* finally 始终执行 */
+    .step.finally-step.done { border-color: #64748b; background: rgba(100, 116, 139, 0.16); color: #cbd5e1; }
+    .step.finally-step.done .state { background: #64748b; color: #fff; }
+
+    .log {
+      width: 100%;
+      max-width: 560px;
+      background: #020617;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.9;
+      min-height: 96px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .log p { margin: 0; color: #94a3b8; }
+    .log .ok { color: #86efac; }
+    .log .bad { color: #fca5a5; }
+    .log .info { color: #64748b; }
+  </style>
+</head>
+<body>
+  <h1>Promise 链式调用演示</h1>
+  <p class="sub">观察 resolve / reject 时值在链上的流转与各步骤的执行顺序</p>
+
+  <div class="ctrl">
+    <button class="ok" id="resolve">resolve('成功数据')</button>
+    <button class="err" id="reject">reject('错误原因')</button>
+    <button id="reset">重置</button>
+  </div>
+
+  <div class="chain" id="chain">
+    <div class="step" data-step="0">
+      <span class="code">new Promise((resolve) => { ... })</span>
+      <span class="desc">Promise 状态由 pending 变为 fulfilled / rejected，只能变一次</span>
+      <span class="state">pending</span>
+    </div>
+
+    <div class="step" data-step="1">
+      <span class="code">.then(value => { return next })</span>
+      <span class="desc">fulfilled 时执行，返回值（含 Promise）会传给下一环</span>
+      <span class="state">pending</span>
+    </div>
+
+    <div class="step" data-step="2">
+      <span class="code">.then(value => { ... })</span>
+      <span class="desc">拿到上一环返回的值继续处理，形成链式调用</span>
+      <span class="state">pending</span>
+    </div>
+
+    <div class="step catch-step" data-step="3">
+      <span class="code">.catch(err => { ... })</span>
+      <span class="desc">链上任一环节 reject 都会跳到这里</span>
+      <span class="state">pending</span>
+    </div>
+
+    <div class="step finally-step" data-step="4">
+      <span class="code">.finally(() => { ... })</span>
+      <span class="desc">无论成功失败都会执行，常用于关闭 loading</span>
+      <span class="state">pending</span>
+    </div>
+  </div>
+
+  <div class="log" id="log">
+    <p class="info">选择 resolve 或 reject 开始演示…</p>
+  </div>
+
+  <script>
+    var steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
+    var logEl = document.getElementById('log');
+    var timers = [];
+
+    function clearTimers() {
+      timers.forEach(clearTimeout);
+      timers = [];
+    }
+
+    function later(fn, ms) {
+      timers.push(setTimeout(fn, ms));
+    }
+
+    function log(text, cls) {
+      if (logEl.querySelector('.info') && logEl.children.length === 1) logEl.innerHTML = '';
+      var p = document.createElement('p');
+      if (cls) p.className = cls;
+      p.textContent = text;
+      logEl.appendChild(p);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function reset() {
+      clearTimers();
+      steps.forEach(function (s) {
+        // 恢复基础 class（catch / finally 为固定修饰）
+        s.className = 'step';
+        if (s.dataset.step === '3') s.className += ' catch-step';
+        if (s.dataset.step === '4') s.className += ' finally-step';
+        s.querySelector('.state').textContent = 'pending';
+      });
+      logEl.innerHTML = '<p class="info">选择 resolve 或 reject 开始演示…</p>';
+    }
+
+    function activate(i, state) {
+      steps[i].classList.add('active');
+      steps[i].querySelector('.state').textContent = state || '执行中';
+      later(function () {
+        steps[i].classList.remove('active');
+        steps[i].classList.add('done');
+        steps[i].querySelector('.state').textContent = '已执行';
+      }, 480);
+    }
+
+    function skip(i, text) {
+      steps[i].classList.add('skipped');
+      steps[i].querySelector('.state').textContent = text || '跳过';
+    }
+
+    // ---- 成功路径 ----
+    function runResolve() {
+      reset();
+      log('[fulfilled] new Promise → pending 变为 fulfilled', 'info');
+
+      later(function () {
+        activate(0, 'fulfilled');
+        log('resolve("成功数据") → 状态锁定为 fulfilled');
+      }, 120);
+
+      later(function () {
+        activate(1);
+        log('.then #1 收到「成功数据」，return "处理后的值"');
+      }, 760);
+
+      then(2, 1400, '.then #2 收到上一环返回的「处理后的值」');
+
+      later(function () {
+        skip(3, '不执行');
+        log('.catch 被跳过（没有 reject）', 'info');
+      }, 2040);
+
+      later(function () {
+        activate(4, '执行');
+        log('.finally 执行 → 关闭 loading', 'ok');
+      }, 2560);
+    }
+
+    function then(i, delay, msg) {
+      later(function () {
+        activate(i);
+        log(msg);
+      }, delay);
+    }
+
+    // ---- 失败路径 ----
+    function runReject() {
+      reset();
+      log('[rejected] new Promise → pending 变为 rejected', 'info');
+
+      later(function () {
+        activate(0, 'rejected');
+        log('reject("错误原因") → 状态锁定为 rejected');
+      }, 120);
+
+      later(function () {
+        skip(1, '跳过');
+        skip(2, '跳过');
+        log('.then #1、#2 全部跳过（rejected 不会进入 then）', 'info');
+      }, 760);
+
+      later(function () {
+        activate(3, '捕获');
+        log('.catch 捕获到「错误原因」，链路在此恢复', 'bad');
+      }, 1500);
+
+      later(function () {
+        activate(4, '执行');
+        log('.finally 依然执行 → 关闭 loading', 'ok');
+      }, 2100);
+    }
+
+    document.getElementById('resolve').addEventListener('click', runResolve);
+    document.getElementById('reject').addEventListener('click', runReject);
+    document.getElementById('reset').addEventListener('click', reset);
+  </script>
+</body>
+</html>
