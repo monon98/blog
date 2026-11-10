@@ -32,6 +32,8 @@ sidebar: false
 
 8. [第三组 · 面试题联动](./interview) 防抖节流 / Event Loop / 虚拟列表 / 图片懒加载 / Promise 链
 
+9. [第四组 · 实用交互组件](./widget) 滑块验证码 / 可拖拽分栏 / 下拉刷新 / Toast / 右键菜单 / 无限滚动
+
 <script setup>
 import Snowflakes from '@components/snowflakes.vue';
 import RandomScroll from '@components/random-scroll.vue';

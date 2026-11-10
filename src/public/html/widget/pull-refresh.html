@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>下拉刷新</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 24px;
+      background: #f1f5f9;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #1e293b;
+    }
+
+    h1 { font-size: 16px; margin: 0; }
+    .sub { font-size: 12px; color: #64748b; margin: -8px 0 0; }
+
+    .phone {
+      width: 320px;
+      height: 440px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bar {
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: #fff;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .bar .time { font-size: 11px; opacity: 0.85; }
+
+    /* 下拉指示器：高度 0 → 随下拉伸展 */
+    .indicator {
+      height: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #64748b;
+      background: #f8fafc;
+      transition: height 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .indicator.release { color: #2563eb; }
+    .indicator.loading { color: #16a34a; }
+
+    .spinner {
+      width: 15px;
+      height: 15px;
+      border: 2px solid #cbd5e1;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    .indicator.loading .spinner { display: block; }
+    .indicator.loading .arrow { display: none; }
+
+    .arrow { transition: transform 0.3s; display: inline-block; }
+    .indicator.release .arrow { transform: rotate(180deg); }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f8fafc;
+      margin-bottom: 8px;
+      font-size: 13px;
+      animation: slideIn 0.35s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .dot {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      background: linear-gradient(135deg, #a5b4fc, #818cf8);
+    }
+
+    .item .meta { flex: 1; }
+    .item .meta b { display: block; font-size: 13px; color: #1e293b; }
+    .item .meta span { font-size: 11px; color: #94a3b8; }
+
+    .foot {
+      font-size: 11px;
+      color: #94a3b8;
+      text-align: center;
+      padding-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>下拉刷新</h1>
+  <p class="sub">在列表顶部按住向下拖动（支持触摸），超过阈值释放即刷新</p>
+
+  <div class="phone">
+    <div class="bar">
+      <span>消息列表</span>
+      <span class="time" id="clock">--:--</span>
+    </div>
+
+    <div class="indicator" id="indicator">
+      <span class="arrow">↓</span>
+      <span class="spinner"></span>
+      <span id="indText">下拉刷新</span>
+    </div>
+
+    <div class="list" id="list"></div>
+  </div>
+
+  <script>
+    var list = document.getElementById('list');
+    var indicator = document.getElementById('indicator');
+    var indText = document.getElementById('indText');
+
+    var THRESHOLD = 70;       // 触发刷新的下拉距离
+    var MAX_PULL = 120;       // 最大下拉（带阻尼）
+    var pulling = false;
+    var startY = 0;
+    var pullY = 0;
+    var refreshing = false;
+
+    var seq = 0;
+    var ICONS = ['💬', '🔔', '📦', '✅', '⭐', '🎯', '🚀', '🧩'];
+
+    function now() {
+      var d = new Date();
+      var p = (n) => String(n).padStart(2, '0');
+      return p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+    }
+
+    function addItem(top) {
+      seq += 1;
+      var el = document.createElement('div');
+      el.className = 'item';
+      el.innerHTML =
+        '<div class="dot">' + ICONS[seq % ICONS.length] + '</div>' +
+        '<div class="meta"><b>新消息 #' + seq + '</b><span>刷新于 ' + now() + '</span></div>';
+      if (top) list.prepend(el);
+      else list.appendChild(el);
+    }
+
+    // 初始数据
+    for (var i = 0; i < 8; i++) addItem(false);
+
+    document.getElementById('clock').textContent = now().slice(0, 5);
+
+    // 阻尼：越往后拉位移越小
+    function dampen(raw) {
+      if (raw <= 0) return 0;
+      return Math.min(MAX_PULL, raw * 0.55);
+    }
+
+    function setIndicator(y) {
+      indicator.style.height = y + 'px';
+      if (refreshing) return;
+
+      if (y >= THRESHOLD) {
+        indicator.classList.add('release');
+        indText.textContent = '释放立即刷新';
+      } else {
+        indicator.classList.remove('release');
+        indText.textContent = '下拉刷新';
+      }
+    }
+
+    function onDown(clientY) {
+      if (refreshing) return;
+      if (list.scrollTop > 0) return;   // 只在顶部触发
+      pulling = true;
+      startY = clientY;
+      pullY = 0;
+      indicator.style.transition = 'none';
+    }
+
+    function onMove(clientY) {
+      if (!pulling || refreshing) return;
+      var raw = clientY - startY;
+      if (raw <= 0) { onUp(); return; }
+
+      pullY = dampen(raw);
+      // 下拉超过阈值后，列表整体跟随轻微位移
+      list.style.transform = 'translateY(' + pullY * 0.35 + 'px)';
+      setIndicator(pullY);
+    }
+
+    function onUp() {
+      if (!pulling) return;
+      pulling = false;
+      indicator.style.transition = '';
+      list.style.transition = 'transform .3s ease';
+      list.style.transform = '';
+
+      if (pullY >= THRESHOLD) refresh();
+      else setIndicator(0);
+
+      setTimeout(function () { list.style.transition = ''; }, 320);
+    }
+
+    function refresh() {
+      refreshing = true;
+      indicator.style.height = THRESHOLD + 'px';
+      indicator.classList.remove('release');
+      indicator.classList.add('loading');
+      indText.textContent = '正在刷新…';
+
+      setTimeout(function () {
+        indicator.classList.remove('loading');
+        indText.textContent = '刷新完成';
+        addItem(true);
+        addItem(true);
+
+        setTimeout(function () {
+          indicator.style.height = '0px';
+          refreshing = false;
+          indText.textContent = '下拉刷新';
+        }, 500);
+      }, 1100);
+    }
+
+    // 鼠标
+    list.addEventListener('mousedown', function (e) { onDown(e.clientY); });
+    document.addEventListener('mousemove', function (e) { onMove(e.clientY); });
+    document.addEventListener('mouseup', onUp);
+
+    // 触摸
+    list.addEventListener('touchstart', function (e) { onDown(e.touches[0].clientY); }, { passive: true });
+    document.addEventListener('touchmove', function (e) { onMove(e.touches[0].clientY); }, { passive: true });
+    document.addEventListener('touchend', onUp);
+  </script>
+</body>
+</html>
