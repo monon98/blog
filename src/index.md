@@ -9,7 +9,7 @@ hero:
   actions:
     - theme: brand
       text: 技术导航
-      link: /docs/技术导航
+      link: /docs/guide/
     # - theme: alt
     #   text: 实用工具
     #   link: /user/1
@@ -17,10 +17,13 @@ hero:
 features:
   - title: 收藏箱
     details: 收藏的破烂
-    link: /docs/collection/user/1. 好用工具软件汇总
+    link: /docs/collection/personal/1.%20好用工具软件汇总
+  - title: 开发笔记
+    details: 开发日常笔记与三方库收集
+    link: /docs/develop/
   - title: 技术导航
     details: 技术导航汇总
-    link: /docs/技术导航
+    link: /docs/guide/
   - title: 面试题
     details: 面试难题总结&记录
     link: /docs/interview/0.%20在线面试题网站收集
