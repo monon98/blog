@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSS 盒模型可视化</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    h1 { font-size: 18px; margin: 0; }
+    .sub { font-size: 13px; color: #64748b; margin: -12px 0 0; }
+
+    .panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px;
+      width: 100%;
+      max-width: 900px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    /* ---------- 可视化区 ---------- */
+    .viz {
+      flex: 1 1 340px;
+      min-width: 300px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+    }
+
+    .layer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+    }
+
+    .margin-box {
+      background: #fca5a5;
+      padding: var(--m);
+      border-radius: 4px;
+    }
+
+    .border-box {
+      background: #fdba74;
+      padding: var(--b);
+      border-radius: 3px;
+    }
+
+    .padding-box {
+      background: #93c5fd;
+      padding: var(--p);
+      border-radius: 3px;
+    }
+
+    .content-box {
+      width: var(--w);
+      height: var(--h);
+      background: #86efac;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #14532d;
+      border-radius: 2px;
+      transition: width 0.25s ease, height 0.25s ease;
+    }
+
+    /* 高亮某一层 */
+    .viz.hl-margin .margin-box { outline: 3px solid #dc2626; outline-offset: 2px; }
+    .viz.hl-border .border-box { outline: 3px solid #dc2626; outline-offset: 2px; }
+    .viz.hl-padding .padding-box { outline: 3px solid #dc2626; outline-offset: 2px; }
+    .viz.hl-content .content-box { outline: 3px solid #dc2626; outline-offset: 2px; }
+
+    .tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.75);
+      color: #334155;
+      margin: 0 6px;
+      white-space: nowrap;
+    }
+
+    /* ---------- 控制区 ---------- */
+    .controls {
+      flex: 1 1 300px;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 92px 1fr 56px;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    .row:hover { background: #f1f5f9; }
+
+    .row .swatch {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      margin-right: 6px;
+      vertical-align: -1px;
+    }
+
+    input[type="range"] { width: 100%; accent-color: #3b82f6; }
+
+    .val {
+      text-align: right;
+      font-family: ui-monospace, Menlo, monospace;
+      color: #475569;
+      font-size: 12px;
+    }
+
+    .sizing {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 13px;
+      padding-top: 6px;
+      border-top: 1px dashed #e2e8f0;
+    }
+
+    .sizing button {
+      flex: 1;
+      padding: 7px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .sizing button.on {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #fff;
+    }
+
+    .result {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.9;
+    }
+
+    .result .k { color: #93c5fd; }
+    .result .total { color: #fbbf24; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <h1>CSS 盒模型可视化</h1>
+  <p class="sub">拖动滑块调整尺寸，悬停左侧色块或右侧行高亮对应层级。</p>
+
+  <div class="panel">
+    <div class="viz" id="viz">
+      <div class="layer margin-box" data-layer="margin">
+        <span class="tag">margin</span>
+        <div class="layer border-box" data-layer="border">
+          <span class="tag">border</span>
+          <div class="layer padding-box" data-layer="padding">
+            <span class="tag">padding</span>
+            <div class="content-box" data-layer="content">content</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <label class="row" data-layer="content">
+        <span><span class="swatch" style="background:#86efac;"></span>content 宽</span>
+        <input type="range" id="w" min="40" max="260" value="160" />
+        <span class="val" id="wVal">160px</span>
+      </label>
+
+      <label class="row" data-layer="content">
+        <span><span class="swatch" style="background:#86efac;"></span>content 高</span>
+        <input type="range" id="h" min="30" max="200" value="90" />
+        <span class="val" id="hVal">90px</span>
+      </label>
+
+      <label class="row" data-layer="padding">
+        <span><span class="swatch" style="background:#93c5fd;"></span>padding</span>
+        <input type="range" id="p" min="0" max="60" value="18" />
+        <span class="val" id="pVal">18px</span>
+      </label>
+
+      <label class="row" data-layer="border">
+        <span><span class="swatch" style="background:#fdba74;"></span>border</span>
+        <input type="range" id="b" min="0" max="30" value="6" />
+        <span class="val" id="bVal">6px</span>
+      </label>
+
+      <label class="row" data-layer="margin">
+        <span><span class="swatch" style="background:#fca5a5;"></span>margin</span>
+        <input type="range" id="m" min="0" max="60" value="20" />
+        <span class="val" id="mVal">20px</span>
+      </label>
+
+      <div class="sizing">
+        <span>box-sizing：</span>
+        <button id="cb" class="on">content-box</button>
+        <button id="bb">border-box</button>
+      </div>
+
+      <div class="result" id="result"></div>
+    </div>
+  </div>
+
+  <script>
+    var state = { w: 160, h: 90, p: 18, b: 6, m: 20, sizing: 'content-box' };
+    var viz = document.getElementById('viz');
+
+    var inputs = ['w', 'h', 'p', 'b', 'm'];
+    inputs.forEach(function (k) {
+      var el = document.getElementById(k);
+      el.addEventListener('input', function () {
+        state[k] = Number(el.value);
+        document.getElementById(k + 'Val').textContent = el.value + 'px';
+        render();
+      });
+    });
+
+    // 高亮联动
+    document.querySelectorAll('[data-layer]').forEach(function (el) {
+      var layer = el.dataset.layer;
+      el.addEventListener('mouseenter', function () { viz.className = 'viz hl-' + layer; });
+      el.addEventListener('mouseleave', function () { viz.className = 'viz'; });
+    });
+
+    // box-sizing 切换
+    document.getElementById('cb').addEventListener('click', function () { setSizing('content-box'); });
+    document.getElementById('bb').addEventListener('click', function () { setSizing('border-box'); });
+
+    function setSizing(s) {
+      state.sizing = s;
+      document.getElementById('cb').classList.toggle('on', s === 'content-box');
+      document.getElementById('bb').classList.toggle('on', s === 'border-box');
+      render();
+    }
+
+    function render() {
+      var p = state.p, b = state.b, m = state.m;
+      var contentW, contentH;
+
+      if (state.sizing === 'content-box') {
+        contentW = state.w;
+        contentH = state.h;
+      } else {
+        // width 指 content + padding + border
+        contentW = Math.max(20, state.w - 2 * p - 2 * b);
+        contentH = Math.max(20, state.h - 2 * p - 2 * b);
+      }
+
+      viz.style.setProperty('--w', contentW + 'px');
+      viz.style.setProperty('--h', contentH + 'px');
+      viz.style.setProperty('--p', p + 'px');
+      viz.style.setProperty('--b', b + 'px');
+      viz.style.setProperty('--m', m + 'px');
+
+      var padW = contentW + 2 * p;
+      var padH = contentH + 2 * p;
+      var borW = padW + 2 * b;
+      var borH = padH + 2 * b;
+      var marW = borW + 2 * m;
+      var marH = borH + 2 * m;
+
+      document.getElementById('result').innerHTML =
+        '<span class="k">content</span>   ' + contentW + ' × ' + contentH + '<br>' +
+        '<span class="k">padding</span>  ' + padW + ' × ' + padH + '<br>' +
+        '<span class="k">border</span>   ' + borW + ' × ' + borH + '<br>' +
+        '<span class="k">margin</span>   ' + marW + ' × ' + marH + '<br>' +
+        '<span class="total">占位合计  ' + marW + ' × ' + marH + ' px</span>';
+    }
+
+    render();
+  </script>
+</body>
+</html>

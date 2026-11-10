@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSS 选择器实战演示</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+
+    h1 { font-size: 18px; margin: 0; }
+    .sub { font-size: 13px; color: #64748b; margin: -10px 0 0; }
+
+    .wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      width: 100%;
+      max-width: 880px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .selectors {
+      flex: 1 1 320px;
+      min-width: 280px;
+    }
+
+    .selectors h2,
+    .preview h2 {
+      font-size: 14px;
+      margin: 0 0 12px;
+      color: #334155;
+    }
+
+    .sel-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .sel {
+      padding: 7px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+      color: #334155;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    .sel:hover { border-color: #3b82f6; color: #1d4ed8; }
+
+    .sel.on {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #fff;
+    }
+
+    .info {
+      margin-top: 16px;
+      padding: 12px 14px;
+      background: #0f172a;
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.8;
+      word-break: break-all;
+    }
+
+    .info .num { color: #fbbf24; font-weight: 700; }
+
+    .reset {
+      margin-top: 12px;
+      padding: 7px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .reset:hover { background: #f1f5f9; }
+
+    .preview { flex: 1 1 300px; min-width: 260px; }
+
+    .list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .item {
+      padding: 11px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #f8fafc;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .item .type {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #475569;
+    }
+
+    .item.matched {
+      background: linear-gradient(90deg, #dbeafe, #eff6ff);
+      border-color: #3b82f6;
+      color: #1d4ed8;
+      transform: translateX(6px);
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+    }
+
+    .item.matched .type { background: #3b82f6; color: #fff; }
+
+    .item.active { border-left: 4px solid #f59e0b; }
+  </style>
+</head>
+<body>
+  <h1>CSS 选择器实战演示</h1>
+  <p class="sub">点击左侧选择器，右侧命中项会高亮并显示匹配数量。</p>
+
+  <div class="wrap">
+    <div class="card selectors">
+      <h2>选择器</h2>
+      <div class="sel-list" id="selList">
+        <button class="sel">li</button>
+        <button class="sel">.item</button>
+        <button class="sel">#list .item</button>
+        <button class="sel">.item.active</button>
+        <button class="sel">li:nth-child(2)</button>
+        <button class="sel">li:first-child</button>
+        <button class="sel">[data-type="js"]</button>
+        <button class="sel">.item:not(.active)</button>
+        <button class="sel">ul > li:last-child</button>
+      </div>
+
+      <div class="info" id="info">点击任意选择器开始匹配…</div>
+
+      <button class="reset" id="reset">清除高亮</button>
+    </div>
+
+    <div class="card preview">
+      <h2>目标 DOM（ul#list）</h2>
+      <ul class="list" id="list">
+        <li class="item active" data-type="js"><span>JavaScript</span><span class="type">js</span></li>
+        <li class="item" data-type="css"><span>CSS</span><span class="type">css</span></li>
+        <li class="item" data-type="js"><span>Vue</span><span class="type">js</span></li>
+        <li class="item" data-type="html"><span>HTML</span><span class="type">html</span></li>
+        <li class="item active" data-type="css"><span>Flexbox</span><span class="type">css</span></li>
+        <li class="item" data-type="js"><span>Canvas</span><span class="type">js</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    var selList = document.getElementById('selList');
+    var info = document.getElementById('info');
+    var items = document.querySelectorAll('#list .item');
+
+    function clearMatch() {
+      items.forEach(function (el) { el.classList.remove('matched'); });
+    }
+
+    selList.addEventListener('click', function (e) {
+      var btn = e.target.closest('.sel');
+      if (!btn) return;
+
+      var selector = btn.textContent.trim();
+
+      selList.querySelectorAll('.sel').forEach(function (b) { b.classList.remove('on'); });
+      btn.classList.add('on');
+      clearMatch();
+
+      var matches;
+      try {
+        matches = document.querySelectorAll(selector);
+      } catch (err) {
+        info.innerHTML = '选择器语法错误：' + selector;
+        return;
+      }
+
+      matches.forEach(function (el) { el.classList.add('matched'); });
+
+      info.innerHTML =
+        'document.querySelectorAll(<span style="color:#7dd3fc">"' + selector + '"</span>)<br>' +
+        '命中 <span class="num">' + matches.length + '</span> 个元素';
+    });
+
+    document.getElementById('reset').addEventListener('click', function () {
+      clearMatch();
+      selList.querySelectorAll('.sel').forEach(function (b) { b.classList.remove('on'); });
+      info.textContent = '点击任意选择器开始匹配…';
+    });
+  </script>
+</body>
+</html>

@@ -26,6 +26,8 @@ sidebar: false
 
 5. [html-frame 原生 HTML 内嵌](./html-frame) iframe 内嵌 `src/public/html/` 下的原生 HTML 案例
 
+6. [第一组 · 与已有文章联动](./article) 扩展卡片 / visibilitychange / BFC / 盒模型 / CSS 选择器
+
 <script setup>
 import Snowflakes from '@components/snowflakes.vue';
 import RandomScroll from '@components/random-scroll.vue';

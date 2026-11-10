@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>扩展卡片 Flexbox 过渡</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 24px;
+    }
+
+    .hint {
+      margin: 0;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    .cards {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      max-width: 780px;
+      height: 300px;
+    }
+
+    .card {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      transition: flex 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card.active { flex: 3.5; }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, var(--c1), var(--c2));
+    }
+
+    .card > * { position: relative; }
+
+    .card .num {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      font-size: 13px;
+      letter-spacing: 2px;
+      opacity: 0.8;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 17px;
+      white-space: nowrap;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .card p {
+      margin: 8px 0 0;
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.92);
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.6s ease 0.15s, opacity 0.4s ease 0.15s;
+    }
+
+    .card.active p {
+      max-height: 140px;
+      opacity: 1;
+    }
+
+    @media (max-width: 600px) {
+      .cards { height: 380px; flex-direction: column; }
+      .card.active { flex: 2.5; }
+      .card p { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <p class="hint">点击卡片展开，其余卡片收起（Flexbox flex + CSS 过渡）</p>
+
+  <div class="cards" id="cards">
+    <div class="card active" style="--c1:#6366f1; --c2:#8b5cf6;">
+      <span class="num">01</span>
+      <h3>弹性布局</h3>
+      <p>利用 flex 属性的过渡动画，让卡片在展开与收起之间平滑切换，无需任何 JavaScript 计算宽度。</p>
+    </div>
+    <div class="card" style="--c1:#0ea5e9; --c2:#22d3ee;">
+      <span class="num">02</span>
+      <h3>纯 CSS 过渡</h3>
+      <p>transition 作用于 flex 属性，浏览器会在主轴尺寸变化时自动插值，性能由合成器接管。</p>
+    </div>
+    <div class="card" style="--c1:#f59e0b; --c2:#ef4444;">
+      <span class="num">03</span>
+      <h3>响应式收缩</h3>
+      <p>窄屏下 flex-direction 自动切换为 column，同一套结构即可适配移动端竖排布局。</p>
+    </div>
+    <div class="card" style="--c1:#10b981; --c2:#84cc16;">
+      <span class="num">04</span>
+      <h3>细节展开</h3>
+      <p>展开时通过 max-height 与 opacity 的延迟过渡，让描述文字优雅浮现，层次分明。</p>
+    </div>
+  </div>
+
+  <script>
+    var cards = document.querySelectorAll('.card');
+    cards.forEach(function (card) {
+      card.addEventListener('click', function () {
+        cards.forEach(function (c) { c.classList.remove('active'); });
+        card.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BFC 演示</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+    }
+
+    h1 { font-size: 18px; margin: 0 0 4px; }
+    .sub { font-size: 13px; color: #64748b; margin: 0 0 20px; }
+
+    .case {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .case-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .case-head h2 { font-size: 15px; margin: 0; }
+    .case-head .desc { font-size: 12px; color: #64748b; margin: 4px 0 0; line-height: 1.6; }
+
+    .toggle {
+      flex-shrink: 0;
+      padding: 6px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      background: #fff;
+      color: #475569;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .toggle.on {
+      background: #16a34a;
+      border-color: #16a34a;
+      color: #fff;
+    }
+
+    .stage {
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .measure {
+      font-size: 12px;
+      margin-top: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .measure.bad { color: #dc2626; }
+    .measure.good { color: #16a34a; }
+
+    /* ---- 案例 1：BFC 包含浮动 ---- */
+    .float-wrap {
+      background: #e0f2fe;
+      border: 1px dashed #0284c7;
+      border-radius: 6px;
+    }
+
+    .float-wrap.bfc { overflow: hidden; }
+
+    .float-item {
+      float: left;
+      width: 84px;
+      height: 84px;
+      margin: 6px;
+      background: #0ea5e9;
+      color: #fff;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+    }
+
+    /* ---- 案例 2：BFC 避免与浮动元素重叠 ---- */
+    .two-col::after { content: ""; display: block; clear: both; }
+
+    .sidebar {
+      float: left;
+      width: 130px;
+      height: 110px;
+      background: #f59e0b;
+      color: #7c2d12;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+    }
+
+    .main {
+      background: #c7d2fe;
+      color: #312e81;
+      font-size: 13px;
+      line-height: 1.7;
+      padding: 10px;
+      border-radius: 6px;
+    }
+
+    .main.bfc { overflow: hidden; }
+
+    /* ---- 案例 3：不同 BFC 之间 margin 不重叠 ---- */
+    .m-cell { border-radius: 6px; }
+
+    .m-cell.bfc { overflow: hidden; }
+
+    .m-item {
+      background: #bbf7d0;
+      color: #14532d;
+      font-size: 13px;
+      padding: 14px;
+      text-align: center;
+      border-radius: 6px;
+    }
+
+    .m-item.a { margin-bottom: 30px; }
+    .m-item.b { margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <h1>BFC 三大特性演示</h1>
+  <p class="sub">点击右上角按钮开启 / 关闭 BFC（通过 overflow: hidden 触发），观察差异。</p>
+
+  <!-- 案例 1 -->
+  <section class="case">
+    <div class="case-head">
+      <div>
+        <h2>① 包含浮动元素</h2>
+        <p class="desc">父容器内只有浮动子元素时，普通容器高度会塌陷为 0；BFC 能包裹住浮动元素。</p>
+      </div>
+      <button class="toggle" data-case="1">开启 BFC</button>
+    </div>
+    <div class="stage">
+      <div class="float-wrap" id="case1">
+        <div class="float-item">float</div>
+        <div class="float-item">float</div>
+        <div class="float-item">float</div>
+      </div>
+      <div class="measure bad" id="measure1">父容器高度：0px（高度塌陷）</div>
+    </div>
+  </section>
+
+  <!-- 案例 2 -->
+  <section class="case">
+    <div class="case-head">
+      <div>
+        <h2>② 避免与浮动元素重叠</h2>
+        <p class="desc">普通块级元素会与浮动元素重叠；BFC 区域不会与浮动元素交叠，形成两栏自适应。</p>
+      </div>
+      <button class="toggle" data-case="2">开启 BFC</button>
+    </div>
+    <div class="stage">
+      <div class="two-col">
+        <div class="sidebar">float 左栏</div>
+        <div class="main" id="case2">
+          主内容区域。未开启 BFC 时，本块的背景会延伸到浮动元素下方，产生重叠；开启 BFC 后会自动收缩到浮动元素右侧。
+        </div>
+      </div>
+      <div class="measure bad" id="measure2">主内容与左栏重叠</div>
+    </div>
+  </section>
+
+  <!-- 案例 3 -->
+  <section class="case">
+    <div class="case-head">
+      <div>
+        <h2>③ 阻止 margin 重叠</h2>
+        <p class="desc">同一 BFC 内相邻元素的 margin 会重叠（30px 而非 60px）；分属不同 BFC 时不重叠。</p>
+      </div>
+      <button class="toggle" data-case="3">开启 BFC</button>
+    </div>
+    <div class="stage">
+      <div id="case3">
+        <div class="m-cell"><div class="m-item a">A（margin-bottom: 30px）</div></div>
+        <div class="m-cell"><div class="m-item b">B（margin-top: 30px）</div></div>
+      </div>
+      <div class="measure bad" id="measure3">A、B 间距：30px（margin 重叠）</div>
+    </div>
+  </section>
+
+  <script>
+    var buttons = document.querySelectorAll('.toggle');
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var no = btn.dataset.case;
+        var on = btn.classList.toggle('on');
+        btn.textContent = on ? '关闭 BFC' : '开启 BFC';
+
+        if (no === '1') document.getElementById('case1').classList.toggle('bfc', on);
+        if (no === '2') document.getElementById('case2').classList.toggle('bfc', on);
+        if (no === '3') {
+          document.querySelectorAll('#case3 .m-cell').forEach(function (c) {
+            c.classList.toggle('bfc', on);
+          });
+        }
+        requestAnimationFrame(measure);
+      });
+    });
+
+    function measure() {
+      // 案例 1
+      var wrap = document.getElementById('case1');
+      var h1 = Math.round(wrap.getBoundingClientRect().height);
+      var m1 = document.getElementById('measure1');
+      var ok1 = h1 > 0;
+      m1.className = 'measure ' + (ok1 ? 'good' : 'bad');
+      m1.textContent = '父容器高度：' + h1 + 'px' + (ok1 ? '（已包含浮动元素）' : '（高度塌陷）');
+
+      // 案例 2
+      var side = document.querySelector('.sidebar').getBoundingClientRect();
+      var main = document.getElementById('case2').getBoundingClientRect();
+      var overlap = main.left < side.right - 1;
+      var m2 = document.getElementById('measure2');
+      m2.className = 'measure ' + (overlap ? 'bad' : 'good');
+      m2.textContent = overlap ? '主内容与左栏重叠' : '主内容位于左栏右侧，无重叠';
+
+      // 案例 3
+      var a = document.querySelector('.m-item.a').getBoundingClientRect();
+      var b = document.querySelector('.m-item.b').getBoundingClientRect();
+      var gap = Math.round(b.top - a.bottom);
+      var m3 = document.getElementById('measure3');
+      var collapsed = gap < 59;
+      m3.className = 'measure ' + (collapsed ? 'bad' : 'good');
+      m3.textContent = 'A、B 间距：' + gap + 'px' + (collapsed ? '（margin 重叠）' : '（margin 未重叠）');
+    }
+
+    window.addEventListener('load', measure);
+    window.addEventListener('resize', measure);
+  </script>
+</body>
+</html>
