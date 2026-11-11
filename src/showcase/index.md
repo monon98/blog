@@ -1,46 +1,20 @@
 ---
-hello: world
 layout: doc
 navbar: true
 sidebar: false
 ---
 
-1. [snowflakes](./snowflakes) 雪花飘落
+# 案例展示
 
-<Snowflakes :width="width" :height="100" :count="50" x="center" color="skyblue" :maxSpeed="1" />
+四个分组共 **57 个**独立案例。原生 HTML 为单文件自包含（iframe 内嵌），Vue 组件仅依赖 `vue`，均可整文件复制到其他项目；每个案例都有独立详情页，包含展示用例、代码实现与使用讲解。
 
-2. random scrolling 滚动字符
+1. [第一组 · 与已有文章联动](./article) — 5 个，扩展卡片 / visibilitychange 后台检测 / BFC / 盒模型 / CSS 选择器，与站内文章一一对应
+2. [第二组 · 纯视觉特效](./visual) — 32 个，视差 / 粒子 / 翻转 / 极光 / 霓虹 / 描边 / Loader / 倾斜卡等
+3. [第三组 · 面试题联动](./interview) — 5 个，防抖节流 / Event Loop / 虚拟列表 / 图片懒加载 / Promise 链
+4. [第四组 · 实用交互组件](./widget) — 15 个，滑块验证码 / 可拖拽分栏 / 下拉刷新 / Toast / 右键菜单 / 无限滚动
 
-<div style="min-height: 120px;">
-    <RandomScroll :immediate="true" />
-    <RandomScroll :immediate="false" />
-</div>
+## 附录
 
-3. [画布](./draw-canvas)
-
-<DrawCanvas :width="width" backgroundColor="#ffffff" color="#000000" borderColor="red" />
-
-4. ~~hover-button 悬浮按钮~~
-
-<HoverButton :icon="icon" text="hover me" />
-
-5. [html-frame 原生 HTML 内嵌](./html-frame) iframe 内嵌 `src/public/html/` 下的原生 HTML 案例
-
-6. [第一组 · 与已有文章联动](./article) 扩展卡片 / visibilitychange / BFC / 盒模型 / CSS 选择器
-
-7. [第二组 · 纯视觉特效](./visual) 视差 / 粒子 / 翻转 / 极光 / 霓虹 / 描边 / Loader / 倾斜卡等 32 个案例
-
-8. [第三组 · 面试题联动](./interview) 防抖节流 / Event Loop / 虚拟列表 / 图片懒加载 / Promise 链
-
-9. [第四组 · 实用交互组件](./widget) 滑块验证码 / 可拖拽分栏 / 下拉刷新 / Toast / 右键菜单 / 无限滚动
-
-<script setup>
-import Snowflakes from '@components/visual/snowflakes.vue';
-import RandomScroll from '@components/visual/random-scroll.vue';
-import DrawCanvas from '@components/widget/draw-canvas.vue';
-import HoverButton from '@components/visual/hover-button.vue';
-
-const width = typeof window !== 'undefined' ? window.innerWidth * 0.7 : 800;
-
-const icon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 8q-1.65 0-2.825 1.175T8 12q0 1.125.563 2.075t1.562 1.475q.4.2.563.587t-.013.788q-.175.35-.525.525t-.7 0q-1.575-.75-2.512-2.225T6 12q0-2.5 1.75-4.25T12 6q1.775 0 3.263.938T17.475 9.5q.15.35-.012.7t-.513.5q-.4.175-.8 0t-.6-.575q-.525-1-1.475-1.562T12 8m0-4Q8.65 4 6.325 6.325T4 12q0 3.15 2.075 5.4t5.2 2.55q.425.05.737.375t.288.75t-.313.7t-.712.25q-1.95-.125-3.638-.975t-2.95-2.213t-1.975-3.125T2 12q0-2.075.788-3.9t2.137-3.175T8.1 2.788T12 2q3.925 0 6.838 2.675t3.187 6.6q.05.4-.237.688t-.713.312t-.762-.275t-.388-.725q-.375-3-2.612-5.137T12 4m7.55 17.5l-3.3-3.275l-.75 2.275q-.125.35-.475.338t-.475-.363L12.275 12.9q-.1-.275.125-.5t.5-.125l7.575 2.275q.35.125.363.475t-.338.475l-2.275.75l3.3 3.3q.425.425.425.975t-.425.975t-.987.425t-.988-.425"/></svg>`;
-</script>
+- [HtmlFrame 原生 HTML 内嵌示例](./html-frame) — `HtmlFrame` 组件用法，iframe 内嵌 `src/public/html/` 下的原生 HTML，自动补全 `/blog/` base
+- [雪花全屏演示](./snowflakes) — 独立全屏效果页
+- [画布绘图](./draw-canvas) — `DrawCanvas` 组件独立演示页（另见第四组第 7 个）
