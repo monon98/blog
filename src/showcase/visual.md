@@ -74,129 +74,121 @@ Web Audio API 合成音序（无外部音频文件）+ `AnalyserNode` 实时频�
 
 <Skeleton />
 
----
-
-## 原有案例（归档至本组）
-
-### 12. CSS 镂空遮罩（原生 HTML）
+## 12. CSS 镂空遮罩（原生 HTML）
 
 <HtmlFrame src="html/visual/css-mask.html" title="CSS 镂空遮罩" :height="460" />
 
-### 13. 雪花飘落（Vue 组件）
+## 13. 雪花飘落（Vue 组件）
 
 <Snowflakes :width="640" :height="180" :count="60" x="center" color="skyblue" :maxSpeed="1" />
 
-### 14. 滚动字符（Vue 组件）
+## 14. 滚动字符（Vue 组件）
 
 <div style="min-height: 130px;">
   <RandomScroll :immediate="true" />
 </div>
 
-### 15. 悬浮按钮（Vue 组件）
+## 15. 悬浮按钮（Vue 组件）
 
 <HoverButton text="hover me" />
 
----
-
-## 更多视觉特效（第二批）
-
-### 16. 3D 倾斜卡片（原生 HTML）
+## 16. 3D 倾斜卡片（原生 HTML）
 
 鼠标位置计算 rotateX / rotateY，高光层跟随，卡片元素分层 translateZ 纵深。
 
 <HtmlFrame src="html/visual/tilt-card.html" title="3D 倾斜卡片" :height="540" />
 
-### 17. 光晕跟随光标（原生 HTML）
+## 17. 光晕跟随光标（原生 HTML）
 
 三层光标以不同插值系数跟随：光晕慢速氛围、圆环悬停放大、实心点精确同步。
 
 <HtmlFrame src="html/visual/glow-cursor.html" title="光晕跟随光标" :height="440" />
 
-### 18. 网格聚光灯（原生 HTML）
+## 18. 网格聚光灯（原生 HTML）
 
 JS 计算每个格子与鼠标的距离，写入 CSS 变量驱动亮度、发光与缩放。
 
 <HtmlFrame src="html/visual/spotlight-grid.html" title="网格聚光灯" :height="560" />
 
-### 19. 星座连线网络（原生 HTML）
+## 19. 星座连线网络（原生 HTML）
 
 粒子间距离小于阈值即连线，鼠标靠近产生斥力并额外连线（Canvas）。
 
 <HtmlFrame src="html/visual/particles-network.html" title="星座连线网络" :height="480" />
 
-### 20. 点击放彩带（原生 HTML）
+## 20. 点击放彩带（原生 HTML）
 
 点击页面发射 DOM 彩带簇，带重力、阻尼、翻转压扁与淡出。
 
 <HtmlFrame src="html/visual/confetti.html" title="点击放彩带" :height="440" />
 
-### 21. 流星雨（原生 HTML）
+## 21. 流星雨（原生 HTML）
 
 Canvas 星空 + 斜向划过的渐变拖尾流星，可调密度，含闪烁星星与月亮。
 
 <HtmlFrame src="html/visual/meteor.html" title="流星雨" :height="480" />
 
-### 22. 霓虹灯文字（原生 HTML）
+## 22. 霓虹灯文字（原生 HTML）
 
 多层 text-shadow 叠出发光，keyframes 模拟霓虹管偶发熄灭，可换文案与发光色。
 
 <HtmlFrame src="html/visual/neon-text.html" title="霓虹灯文字" :height="520" />
 
-### 23. 故障风文字（原生 HTML）
+## 23. 故障风文字（原生 HTML）
 
 两层伪元素染红 / 青，clip-path 分段切片反向位移做 RGB 通道错位，hover 加剧。
 
 <HtmlFrame src="html/visual/glitch-text.html" title="故障风文字" :height="440" />
 
-### 24. 文字逐词入场（原生 HTML）
+## 24. 文字逐词入场（原生 HTML）
 
 按词包 overflow 遮罩，translateY 依次浮现，IntersectionObserver 触发、可重播。
 
 <HtmlFrame src="html/visual/split-text-reveal.html" title="文字逐词入场" :height="640" />
 
-### 25. 极光背景（原生 HTML）
+## 25. 极光背景（原生 HTML）
 
 四层椭圆渐变 blur + screen 混合，不同周期漂移旋转，可调速与暂停。
 
 <HtmlFrame src="html/visual/aurora.html" title="极光背景" :height="440" />
 
-### 26. 液态融球背景（原生 HTML）
+## 26. 液态融球背景（原生 HTML）
 
 色块 border-radius 形变漂浮，外层 blur + contrast 让相邻色块融化融合（gooey）。
 
 <HtmlFrame src="html/visual/liquid-blob.html" title="液态融球背景" :height="460" />
 
-### 27. 波点矩阵涟漪（原生 HTML）
+## 27. 波点矩阵涟漪（原生 HTML）
 
 鼠标靠近的波点按距离放大点亮，点击产生扩散环。
 
 <HtmlFrame src="html/visual/hover-grid.html" title="波点矩阵涟漪" :height="580" />
 
-### 28. SVG 路径描边绘画（原生 HTML）
+## 28. SVG 路径描边绘画（原生 HTML）
 
 用 getTotalLength 校准路径长度，dashoffset 依次画出山水与小屋，最后淡入填充。
 
 <HtmlFrame src="html/visual/stroke-draw.html" title="SVG 路径描边绘画" :height="520" />
 
-### 29. 纯 CSS Loader 合集（原生 HTML）
+## 29. 纯 CSS Loader 合集（原生 HTML）
 
 10 种常用加载动画，全部只用 CSS：旋转环 / 跳动点 / 均衡器 / 轨道 / 波纹等。
 
 <HtmlFrame src="html/visual/loading-spinners.html" title="纯 CSS Loader 合集" :height="760" />
 
-### 30. SVG 模拟指针时钟（原生 HTML）
+## 30. SVG 模拟指针时钟（原生 HTML）
 
 60 格刻度 + 三针，秒针按 rAF 平滑扫动（非跳秒），可隐藏秒针与切时区。
 
 <HtmlFrame src="html/visual/analog-clock.html" title="SVG 模拟指针时钟" :height="540" />
 
-### 31. 数字滚动计数器（Vue 组件）
+## 31. 数字滚动计数器（Vue 组件）
 
 进入视口从 0 滚到目标值，easeOutExpo 缓动收尾，支持前缀 / 后缀与小数位。
 
 <CounterRoll />
 
-### 32. 昼夜切换（Vue 组件）
+## 32. 昼夜切换（Vue 组件）
 
 太阳月亮交替升降、星星淡入、云朵飘散，天空 / 地面 / 面板全场景平滑过渡。
 
