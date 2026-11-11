@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>纯 CSS Loader 合集</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 26px 20px;
+      background: #0f172a;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    h1 { font-size: 18px; margin: 0; }
+    .sub { font-size: 13px; color: #64748b; margin: -14px 0 0; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 14px;
+      width: 100%;
+      max-width: 760px;
+    }
+
+    .cell {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 12px;
+      padding: 22px 12px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .stage {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .name {
+      font-size: 12px;
+      color: #94a3b8;
+      font-family: ui-monospace, Menlo, monospace;
+    }
+
+    /* ---------- 1. 旋转圆环 ---------- */
+    .l-spinner {
+      width: 44px; height: 44px;
+      border: 4px solid rgba(148, 163, 184, 0.25);
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---------- 2. 双环反向 ---------- */
+    .l-dual {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      border: 4px solid transparent;
+      border-top-color: #f472b6;
+      border-bottom-color: #f472b6;
+      animation: spin 1.1s linear infinite;
+      position: relative;
+    }
+    .l-dual::after {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border-radius: 50%;
+      border: 4px solid transparent;
+      border-left-color: #fbbf24;
+      border-right-color: #fbbf24;
+      animation: spin 0.7s linear infinite reverse;
+    }
+
+    /* ---------- 3. 跳动圆点 ---------- */
+    .l-dots { display: flex; gap: 7px; }
+    .l-dots i {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: #34d399;
+      animation: bounce 1.1s ease-in-out infinite;
+    }
+    .l-dots i:nth-child(2) { animation-delay: 0.15s; background: #22d3ee; }
+    .l-dots i:nth-child(3) { animation-delay: 0.3s; background: #818cf8; }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+      50% { transform: translateY(-14px) scale(1.15); opacity: 1; }
+    }
+
+    /* ---------- 4. 脉冲圆 ---------- */
+    .l-pulse {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: #a78bfa;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(0.7); box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.6); }
+      50% { transform: scale(1); box-shadow: 0 0 0 16px rgba(167, 139, 250, 0); }
+    }
+
+    /* ---------- 5. 时钟秒针 ---------- */
+    .l-clock {
+      width: 44px; height: 44px;
+      border: 3px solid rgba(148, 163, 184, 0.4);
+      border-radius: 50%;
+      position: relative;
+    }
+    .l-clock::before {
+      content: "";
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 3px; height: 15px;
+      background: #38bdf8;
+      transform-origin: top center;
+      transform: translate(-50%, 0) rotate(0deg);
+      animation: spin 1.6s linear infinite;
+      border-radius: 2px;
+    }
+    .l-clock::after {
+      content: "";
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 3px; height: 10px;
+      background: #f472b6;
+      transform-origin: top center;
+      transform: translate(-50%, 0) rotate(90deg);
+      animation: spin 8s linear infinite;
+      border-radius: 2px;
+    }
+
+    /* ---------- 6. 摆动条 ---------- */
+    .l-bars { display: flex; gap: 5px; align-items: center; height: 44px; }
+    .l-bars i {
+      width: 7px; height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(180deg, #38bdf8, #818cf8);
+      animation: bars 1s ease-in-out infinite;
+    }
+    .l-bars i:nth-child(2) { animation-delay: 0.12s; }
+    .l-bars i:nth-child(3) { animation-delay: 0.24s; }
+    .l-bars i:nth-child(4) { animation-delay: 0.36s; }
+    .l-bars i:nth-child(5) { animation-delay: 0.48s; }
+    @keyframes bars {
+      0%, 100% { transform: scaleY(0.35); }
+      50% { transform: scaleY(1); }
+    }
+
+    /* ---------- 7. 逆时针轨道 ---------- */
+    .l-orbit {
+      width: 46px; height: 46px;
+      position: relative;
+      animation: spin 1.4s linear infinite;
+    }
+    .l-orbit i {
+      position: absolute;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: #fbbf24;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+    }
+    .l-orbit i:nth-child(2) { top: auto; bottom: 0; background: #f472b6; width: 9px; height: 9px; }
+    .l-orbit i:nth-child(3) { top: 50%; left: 0; background: #22d3ee; width: 7px; height: 7px; transform: translateY(-50%); }
+
+    /* ---------- 8. 进度条 ---------- */
+    .l-progress {
+      width: 110px; height: 8px;
+      background: rgba(148, 163, 184, 0.2);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+    .l-progress::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      width: 40%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #34d399, #22d3ee);
+      animation: slide 1.3s ease-in-out infinite;
+    }
+    @keyframes slide {
+      0% { transform: translateX(-110%); }
+      100% { transform: translateX(280%); }
+    }
+
+    /* ---------- 9. 翻转方块 ---------- */
+    .l-flip {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #f472b6, #fb923c);
+      animation: flip 1.4s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+    }
+    @keyframes flip {
+      0% { transform: rotate(0deg) scale(1); border-radius: 8px; }
+      50% { transform: rotate(180deg) scale(0.7); border-radius: 50%; }
+      100% { transform: rotate(360deg) scale(1); border-radius: 8px; }
+    }
+
+    /* ---------- 10. 扩散波纹 ---------- */
+    .l-ripple { position: relative; width: 48px; height: 48px; }
+    .l-ripple i {
+      position: absolute;
+      inset: 0;
+      border: 3px solid #38bdf8;
+      border-radius: 50%;
+      animation: ripple 1.6s ease-out infinite;
+      opacity: 0;
+    }
+    .l-ripple i:nth-child(2) { animation-delay: 0.5s; border-color: #818cf8; }
+    .l-ripple i:nth-child(3) { animation-delay: 1s; border-color: #f472b6; }
+    @keyframes ripple {
+      0% { transform: scale(0.2); opacity: 1; }
+      100% { transform: scale(1); opacity: 0; }
+    }
+
+    .tip {
+      font-size: 12px;
+      color: #475569;
+      max-width: 760px;
+      line-height: 1.9;
+      text-align: center;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>纯 CSS Loader 合集</h1>
+  <p class="sub">10 种常见加载动画，全部只用 CSS 动画，无 JavaScript</p>
+
+  <div class="grid">
+    <div class="cell"><div class="stage"><div class="l-spinner"></div></div><span class="name">spinner</span></div>
+    <div class="cell"><div class="stage"><div class="l-dual"></div></div><span class="name">dual-ring</span></div>
+    <div class="cell"><div class="stage"><div class="l-dots"><i></i><i></i><i></i></div></div><span class="name">bouncing-dots</span></div>
+    <div class="cell"><div class="stage"><div class="l-pulse"></div></div><span class="name">pulse</span></div>
+    <div class="cell"><div class="stage"><div class="l-clock"></div></div><span class="name">clock</span></div>
+    <div class="cell"><div class="stage"><div class="l-bars"><i></i><i></i><i></i><i></i><i></i></div></div><span class="name">equalizer</span></div>
+    <div class="cell"><div class="stage"><div class="l-orbit"><i></i><i></i><i></i></div></div><span class="name">orbit</span></div>
+    <div class="cell"><div class="stage"><div class="l-progress"></div></div><span class="name">progress</span></div>
+    <div class="cell"><div class="stage"><div class="l-flip"></div></div><span class="name">flip-square</span></div>
+    <div class="cell"><div class="stage"><div class="l-ripple"><i></i><i></i><i></i></div></div><span class="name">ripple</span></div>
+  </div>
+
+  <p class="tip">
+    常用手法：<code>border</code> 分色旋转 · <code>animation-delay</code> 制造序列 ·
+    <code>transform-origin</code> 做摆动 · <code>box-shadow</code> 扩散 · 伪元素补充图层。
+  </p>
+</body>
+</html>

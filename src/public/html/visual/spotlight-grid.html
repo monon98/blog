@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>网格聚光灯</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 24px;
+      background: #070a16;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #e2e8f0;
+    }
+
+    h1 { font-size: 18px; margin: 0; }
+    .sub { font-size: 13px; color: #64748b; margin: -12px 0 0; }
+
+    .board {
+      position: relative;
+      width: 100%;
+      max-width: 720px;
+      height: 360px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #0b1120;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      cursor: crosshair;
+    }
+
+    .grid {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(18, 1fr);
+      grid-template-rows: repeat(9, 1fr);
+      gap: 6px;
+      padding: 10px;
+    }
+
+    .cell {
+      border-radius: 6px;
+      background: rgba(148, 163, 184, 0.07);
+      transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
+    }
+
+    /* JS 按距离写入 --d（0~1，越近越小） */
+    .cell.lit {
+      background: rgba(129, 140, 248, calc(0.9 - var(--d) * 0.75));
+      box-shadow: 0 0 calc(18px - var(--d) * 14px) rgba(129, 140, 248, 0.75);
+      transform: scale(calc(1.18 - var(--d) * 0.2));
+    }
+
+    /* 顶层聚光光斑跟随鼠标 */
+    .spot {
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(165, 180, 252, 0.16), transparent 62%);
+      transform: translate(-50%, -50%);
+      mix-blend-mode: screen;
+    }
+
+    .readout {
+      font-size: 12px;
+      font-family: ui-monospace, Menlo, monospace;
+      color: #64748b;
+      min-height: 18px;
+    }
+
+    .readout b { color: #a5b4fc; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>网格聚光灯</h1>
+  <p class="sub">JS 计算每个格子与鼠标的距离，越近越亮（CSS 变量驱动透明度与发光）</p>
+
+  <div class="board" id="board">
+    <div class="grid" id="grid"></div>
+    <div class="spot" id="spot"></div>
+  </div>
+
+  <div class="readout" id="readout">移动鼠标到网格上…</div>
+
+  <script>
+    var COLS = 18;
+    var ROWS = 9;
+    var RADIUS = 170;      // 照亮半径 px
+
+    var board = document.getElementById('board');
+    var grid = document.getElementById('grid');
+    var spot = document.getElementById('spot');
+    var readout = document.getElementById('readout');
+
+    // 生成格子
+    var cells = [];
+    for (var i = 0; i < COLS * ROWS; i++) {
+      var c = document.createElement('div');
+      c.className = 'cell';
+      grid.appendChild(c);
+      cells.push(c);
+    }
+
+    // 预存每个格子中心（相对 board）
+    var centers = cells.map(function (cell) {
+      return null;   // 懒加载，首次移动时测量
+    });
+
+    var litCount = 0;
+
+    board.addEventListener('mousemove', function (e) {
+      var rect = board.getBoundingClientRect();
+      var mx = e.clientX - rect.left;
+      var my = e.clientY - rect.top;
+
+      spot.style.left = mx + 'px';
+      spot.style.top = my + 'px';
+
+      litCount = 0;
+      var nearest = Infinity;
+
+      for (var i = 0; i < cells.length; i++) {
+        var cRect = cells[i].getBoundingClientRect();
+        var cx = cRect.left - rect.left + cRect.width / 2;
+        var cy = cRect.top - rect.top + cRect.height / 2;
+
+        var dist = Math.hypot(cx - mx, cy - my);
+
+        if (dist < RADIUS) {
+          var d = dist / RADIUS;             // 0（最近）~ 1（边缘）
+          cells[i].style.setProperty('--d', d.toFixed(3));
+          cells[i].classList.add('lit');
+          litCount++;
+          if (dist < nearest) nearest = dist;
+        } else if (cells[i].classList.contains('lit')) {
+          cells[i].classList.remove('lit');
+        }
+      }
+
+      readout.innerHTML =
+        '照亮格子 <b>' + litCount + '</b> / ' + cells.length +
+        (litCount ? ' · 最近距离 <b>' + nearest.toFixed(0) + 'px</b>' : '');
+    });
+
+    board.addEventListener('mouseleave', function () {
+      cells.forEach(function (c) { c.classList.remove('lit'); });
+      readout.textContent = '移动鼠标到网格上…';
+    });
+  </script>
+</body>
+</html>

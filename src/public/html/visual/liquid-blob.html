@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>液态融球背景</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #0a0a14;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #f1f5f9;
+    }
+
+    .scene {
+      position: relative;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      text-align: center;
+      padding: 24px;
+      isolation: isolate;
+    }
+
+    /* 融球容器：背景模糊 + 反相，形成 gooey 液态融合 */
+    .goo {
+      position: absolute;
+      inset: -10%;
+      z-index: -1;
+      filter: blur(46px) contrast(28);
+      background: #0a0a14;
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      will-change: border-radius, transform;
+    }
+
+    .b1 {
+      width: 34vmin; height: 34vmin;
+      left: 16%; top: 22%;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      animation: morph1 9s ease-in-out infinite alternate, float1 13s ease-in-out infinite;
+    }
+
+    .b2 {
+      width: 28vmin; height: 28vmin;
+      right: 18%; top: 30%;
+      background: linear-gradient(135deg, #06b6d4, #22d3ee);
+      animation: morph2 11s ease-in-out infinite alternate, float2 15s ease-in-out infinite;
+    }
+
+    .b3 {
+      width: 24vmin; height: 24vmin;
+      left: 38%; bottom: 16%;
+      background: linear-gradient(135deg, #ec4899, #f472b6);
+      animation: morph1 8s ease-in-out infinite alternate-reverse, float3 12s ease-in-out infinite;
+    }
+
+    .b4 {
+      width: 18vmin; height: 18vmin;
+      right: 30%; bottom: 24%;
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      animation: morph2 7s ease-in-out infinite alternate-reverse, float1 14s ease-in-out infinite reverse;
+    }
+
+    /* 形变：border-radius 在 8 组数值间循环 */
+    @keyframes morph1 {
+      0%   { border-radius: 42% 58% 62% 38% / 45% 42% 58% 55%; }
+      33%  { border-radius: 62% 38% 41% 59% / 58% 62% 38% 42%; }
+      66%  { border-radius: 38% 62% 55% 45% / 42% 38% 62% 58%; }
+      100% { border-radius: 55% 45% 38% 62% / 62% 55% 45% 38%; }
+    }
+
+    @keyframes morph2 {
+      0%   { border-radius: 58% 42% 35% 65% / 52% 60% 40% 48%; }
+      50%  { border-radius: 35% 65% 58% 42% / 40% 45% 55% 60%; }
+      100% { border-radius: 65% 35% 48% 52% / 58% 42% 58% 42%; }
+    }
+
+    @keyframes float1 {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(6vmin, -5vmin) rotate(24deg); }
+    }
+
+    @keyframes float2 {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-7vmin, 6vmin); }
+    }
+
+    @keyframes float3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(4vmin, -7vmin) scale(1.14); }
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 6vw, 52px);
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    p {
+      margin: 0;
+      max-width: 540px;
+      font-size: 14px;
+      line-height: 2;
+      color: rgba(226, 232, 240, 0.88);
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7);
+    }
+
+    .ctrl { display: flex; gap: 10px; margin-top: 6px; }
+
+    .ctrl button {
+      padding: 9px 22px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.32);
+      color: #f1f5f9;
+      font-size: 13px;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .ctrl button:hover { background: rgba(0, 0, 0, 0.55); transform: translateY(-2px); }
+
+    .tip {
+      position: absolute;
+      bottom: 16px;
+      font-size: 11px;
+      color: rgba(148, 163, 184, 0.6);
+    }
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <!-- 高对比 + 强模糊 = gooey 融合 -->
+    <div class="goo">
+      <div class="blob b1"></div>
+      <div class="blob b2"></div>
+      <div class="blob b3"></div>
+      <div class="blob b4"></div>
+    </div>
+
+    <h1>液态融球背景</h1>
+    <p>
+      色块在 <code>border-radius</code> 四组数值间形变并缓慢漂浮；
+      外层 <code>blur + contrast(28)</code> 让相邻色块靠近时"融化"在一起，形成液态融合效果。
+    </p>
+
+    <div class="ctrl">
+      <button id="shrink">让色块变小</button>
+      <button id="pause">暂停形变</button>
+    </div>
+
+    <div class="tip">gooey 滤镜技巧 · 纯 CSS 动画 · 无 JavaScript 依赖</div>
+  </div>
+
+  <script>
+    var blobs = document.querySelectorAll('.blob');
+    var small = false;
+    var paused = false;
+
+    document.getElementById('shrink').addEventListener('click', function () {
+      small = !small;
+      blobs.forEach(function (b) {
+        b.style.transform = small ? 'scale(0.62)' : '';
+      });
+      // transform 与 keyframes 冲突时用 zoom 思路：这里直接调整尺寸更稳
+      blobs.forEach(function (b) {
+        b.style.zoom = small ? 0.62 : 1;
+      });
+      this.textContent = small ? '让色块复原' : '让色块变小';
+    });
+
+    document.getElementById('pause').addEventListener('click', function () {
+      paused = !paused;
+      blobs.forEach(function (b) {
+        b.style.animationPlayState = paused ? 'paused' : 'running';
+      });
+      this.textContent = paused ? '▶ 继续形变' : '⏸ 暂停形变';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>点击放彩带</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #0b1120;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #e2e8f0;
+    }
+
+    .stage {
+      position: relative;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    h1 { margin: 0; font-size: 22px; }
+    .sub { margin: 0; font-size: 13px; color: #64748b; text-align: center; padding: 0 20px; }
+
+    .fire-btn {
+      padding: 13px 36px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #f43f5e, #f59e0b);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(244, 63, 94, 0.35);
+      transition: transform 0.15s, box-shadow 0.2s;
+      z-index: 2;
+    }
+
+    .fire-btn:hover { transform: translateY(-2px); box-shadow: 0 16px 36px rgba(244, 63, 94, 0.45); }
+    .fire-btn:active { transform: scale(0.96); }
+
+    .counter {
+      font-size: 12px;
+      color: #475569;
+      z-index: 2;
+    }
+
+    .counter b { color: #fbbf24; font-variant-numeric: tabular-nums; }
+
+    /* 彩带碎片：绝对定位，JS 控制 transform / opacity */
+    .piece {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 10px;
+      height: 16px;
+      border-radius: 2px;
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+
+    .piece.circle { border-radius: 50%; width: 12px; height: 12px; }
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <h1>🎉 点击放彩带</h1>
+    <p class="sub">点击页面任意位置（或按钮）发射一簇 DOM 彩带，带重力、旋转与淡出</p>
+    <button class="fire-btn" id="fire">放一簇彩带</button>
+    <div class="counter">已发射 <b id="count">0</b> 簇 · 碎片 <b id="pieces">0</b></div>
+  </div>
+
+  <script>
+    var COLORS = ['#f43f5e', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#06b6d4', '#f97316', '#ec4899'];
+    var stage = document.getElementById('stage');
+    var countEl = document.getElementById('count');
+    var piecesEl = document.getElementById('pieces');
+
+    var burstCount = 0;
+    var alive = 0;
+
+    function burst(x, y) {
+      burstCount++;
+      countEl.textContent = burstCount;
+
+      var n = 46 + Math.floor(Math.random() * 26);   // 每簇数量
+
+      for (var i = 0; i < n; i++) {
+        var el = document.createElement('div');
+        el.className = 'piece' + (Math.random() > 0.7 ? ' circle' : '');
+        el.style.background = COLORS[(Math.random() * COLORS.length) | 0];
+        document.body.appendChild(el);
+        alive++;
+        piecesEl.textContent = alive;
+
+        // 初速：向上半圆放射
+        var angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.1;
+        var speed = 6 + Math.random() * 9;
+        var state = {
+          x: x, y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          rot: Math.random() * 360,
+          vr: (Math.random() - 0.5) * 26,     // 角速度
+          w: 6 + Math.random() * 8,
+          life: 1,                             // 不透明度
+          decay: 0.010 + Math.random() * 0.010
+        };
+
+        (function (el, state) {
+          var squash = 0;   // 空气阻力造成的翻转压扁
+          function step() {
+            state.vy += 0.34;                  // 重力
+            state.vx *= 0.985;                 // 阻尼
+            state.vy *= 0.985;
+            state.x += state.vx;
+            state.y += state.vy;
+            state.rot += state.vr;
+            state.life -= state.decay;
+
+            if (state.life <= 0 || state.y > window.innerHeight + 40) {
+              el.remove();
+              alive--;
+              piecesEl.textContent = Math.max(0, alive);
+              return;
+            }
+
+            // 翻转压扁：用 scaleY 模拟纸片翻飞
+            squash = Math.sin(state.rot * Math.PI / 180);
+
+            el.style.transform =
+              'translate(' + state.x.toFixed(1) + 'px,' + state.y.toFixed(1) + 'px) ' +
+              'rotate(' + state.rot.toFixed(1) + 'deg) ' +
+              'scaleY(' + Math.max(0.15, Math.abs(squash)).toFixed(2) + ')';
+            el.style.opacity = Math.min(1, state.life * 2).toFixed(2);
+
+            requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        })(el, state);
+      }
+    }
+
+    stage.addEventListener('click', function (e) {
+      burst(e.clientX, e.clientY);
+    });
+
+    document.getElementById('fire').addEventListener('click', function (e) {
+      e.stopPropagation();
+      burst(window.innerWidth / 2, window.innerHeight * 0.62);
+    });
+
+    // 进入页面自动来一簇
+    setTimeout(function () {
+      burst(window.innerWidth / 2, window.innerHeight * 0.55);
+    }, 400);
+  </script>
+</body>
+</html>

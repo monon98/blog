@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D 倾斜卡片</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      padding: 24px;
+      background: linear-gradient(160deg, #0f172a, #1e293b);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #e2e8f0;
+    }
+
+    .hint { margin: 0; font-size: 13px; color: #94a3b8; }
+
+    .card-wrap {
+      perspective: 1000px;   /* 建立 3D 视距 */
+      width: 300px;
+      height: 380px;
+    }
+
+    .card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: transform 0.12s ease-out;
+      background:
+        radial-gradient(120% 90% at 20% 0%, #312e81 0%, transparent 55%),
+        linear-gradient(155deg, #1e1b4b 0%, #312e81 60%, #0f172a 100%);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    /* 高光层：位置由 JS 写入的 --mx / --my 控制 */
+    .glare {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        420px circle at var(--mx, 50%) var(--my, 50%),
+        rgba(255, 255, 255, 0.22),
+        transparent 45%
+      );
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card:hover .glare { opacity: 1; }
+
+    .badge {
+      position: absolute;
+      top: 22px;
+      left: 26px;
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: #a5b4fc;
+      text-transform: uppercase;
+      transform: translateZ(40px);
+    }
+
+    .icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      font-size: 58px;
+      transform: translate(-50%, -60%) translateZ(60px);
+      filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45));
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 21px;
+      transform: translateZ(34px);
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #c7d2fe;
+      transform: translateZ(22px);
+    }
+
+    .meta {
+      display: flex;
+      gap: 14px;
+      margin-top: 16px;
+      font-size: 11px;
+      color: #818cf8;
+      transform: translateZ(16px);
+    }
+  </style>
+</head>
+<body>
+  <p class="hint">移动鼠标查看倾斜与高光跟随（transform 3D + 径向渐变高光）</p>
+
+  <div class="card-wrap">
+    <div class="card" id="card">
+      <div class="glare"></div>
+      <span class="badge">Tilt Card</span>
+      <div class="icon">🃏</div>
+      <h3>3D 倾斜卡片</h3>
+      <p>根据鼠标在卡片上的相对位置计算 rotateX / rotateY，高光层同步偏移，营造立体按压感。</p>
+      <div class="meta"><span>preserve-3d</span><span>translateZ</span><span>pointer-events</span></div>
+    </div>
+  </div>
+
+  <script>
+    var wrap = document.querySelector('.card-wrap');
+    var card = document.getElementById('card');
+
+    var MAX = 14;   // 最大倾斜角度
+
+    wrap.addEventListener('mousemove', function (e) {
+      var rect = card.getBoundingClientRect();
+      var px = (e.clientX - rect.left) / rect.width;    // 0 ~ 1
+      var py = (e.clientY - rect.top) / rect.height;
+
+      // 鼠标在右侧 → 卡片向左转（rotateY 为负）
+      var rotateY = (px - 0.5) * 2 * MAX;
+      var rotateX = (0.5 - py) * 2 * MAX;
+
+      card.style.transform =
+        'rotateX(' + rotateX.toFixed(2) + 'deg) rotateY(' + rotateY.toFixed(2) + 'deg)';
+
+      card.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
+      card.style.setProperty('--my', (py * 100).toFixed(1) + '%');
+    });
+
+    wrap.addEventListener('mouseleave', function () {
+      card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    });
+  </script>
+</body>
+</html>

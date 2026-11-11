@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>故障风文字</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 24px;
+      background: #07070c;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #e5e7eb;
+      overflow: hidden;
+    }
+
+    /* 扫描线背景 */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.035) 0 1px,
+        transparent 1px 4px
+      );
+      z-index: 5;
+    }
+
+    .glitch {
+      position: relative;
+      font-size: clamp(40px, 9vw, 86px);
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: #f3f4f6;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* 两层伪元素复制文本，做 RGB 错位 */
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .glitch::before {
+      color: #ff3d67;          /* 红色通道 */
+      z-index: -1;
+      animation: glitch-a 2.6s infinite linear alternate-reverse;
+    }
+
+    .glitch::after {
+      color: #00e5ff;          /* 青色通道 */
+      z-index: -2;
+      animation: glitch-b 3.1s infinite linear alternate-reverse;
+    }
+
+    /* 位移切片：用 clip-path 分段抖动 */
+    @keyframes glitch-a {
+      0%   { clip-path: inset(20% 0 62% 0); transform: translate(-4px, 2px); }
+      10%  { clip-path: inset(70% 0 8% 0);  transform: translate(3px, -1px); }
+      20%  { clip-path: inset(44% 0 40% 0); transform: translate(-5px, 1px); }
+      30%  { clip-path: inset(6% 0 84% 0);  transform: translate(4px, 2px); }
+      40%  { clip-path: inset(86% 0 4% 0);  transform: translate(-3px, -2px); }
+      50%  { clip-path: inset(34% 0 52% 0); transform: translate(5px, 1px); }
+      60%  { clip-path: inset(58% 0 26% 0); transform: translate(-4px, 2px); }
+      70%  { clip-path: inset(12% 0 74% 0); transform: translate(3px, -2px); }
+      80%  { clip-path: inset(64% 0 18% 0); transform: translate(-5px, 1px); }
+      90%  { clip-path: inset(28% 0 58% 0); transform: translate(4px, 2px); }
+      100% { clip-path: inset(78% 0 6% 0);  transform: translate(-3px, -1px); }
+    }
+
+    @keyframes glitch-b {
+      0%   { clip-path: inset(64% 0 18% 0); transform: translate(4px, -2px); }
+      12%  { clip-path: inset(16% 0 70% 0); transform: translate(-4px, 1px); }
+      24%  { clip-path: inset(50% 0 34% 0); transform: translate(5px, 2px); }
+      36%  { clip-path: inset(8% 0 82% 0);  transform: translate(-3px, -1px); }
+      48%  { clip-path: inset(76% 0 8% 0);  transform: translate(4px, 2px); }
+      60%  { clip-path: inset(38% 0 46% 0); transform: translate(-5px, -2px); }
+      72%  { clip-path: inset(56% 0 28% 0); transform: translate(3px, 1px); }
+      84%  { clip-path: inset(24% 0 62% 0); transform: translate(-4px, 2px); }
+      100% { clip-path: inset(88% 0 2% 0);  transform: translate(5px, -1px); }
+    }
+
+    /* hover / 点击时加剧 */
+    .glitch.hot::before { animation-duration: 0.4s; }
+    .glitch.hot::after  { animation-duration: 0.5s; }
+    .glitch.hot { animation: shake 0.18s infinite; }
+
+    @keyframes shake {
+      0% { transform: translate(0); }
+      25% { transform: translate(-2px, 1px); }
+      50% { transform: translate(2px, -1px); }
+      75% { transform: translate(-1px, -1px); }
+      100% { transform: translate(1px, 1px); }
+    }
+
+    .ctrl { display: flex; gap: 10px; }
+
+    .ctrl button {
+      padding: 9px 20px;
+      border: 1px solid #3f3f46;
+      border-radius: 8px;
+      background: #13131a;
+      color: #d1d5db;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ctrl button:hover { border-color: #ff3d67; color: #ff8fa3; }
+
+    .tip {
+      font-size: 12px;
+      color: #52525b;
+      text-align: center;
+      line-height: 1.8;
+      margin: 0;
+      max-width: 520px;
+    }
+
+    .tip code { color: #a1a1aa; }
+  </style>
+</head>
+<body>
+  <div class="glitch" id="glitch" data-text="GLITCH">GLITCH</div>
+
+  <div class="ctrl">
+    <button id="hit">触发一次强故障</button>
+    <button id="swap">换文案</button>
+  </div>
+
+  <p class="tip">
+    两层伪元素复刻文本并染成红 / 青，用 <code>clip-path</code> 分段切片 + 反向 <code>translate</code>
+    制造 RGB 通道错位；hover 时动画加速并整体抖动。
+  </p>
+
+  <script>
+    var glitch = document.getElementById('glitch');
+
+    glitch.addEventListener('mouseenter', function () { glitch.classList.add('hot'); });
+    glitch.addEventListener('mouseleave', function () { glitch.classList.remove('hot'); });
+
+    document.getElementById('hit').addEventListener('click', function () {
+      glitch.classList.add('hot');
+      setTimeout(function () { glitch.classList.remove('hot'); }, 900);
+    });
+
+    var texts = ['GLITCH', '故障 404', 'SYSTEM ERR', '失真信号'];
+    var idx = 0;
+
+    document.getElementById('swap').addEventListener('click', function () {
+      idx = (idx + 1) % texts.length;
+      glitch.textContent = texts[idx];
+      glitch.setAttribute('data-text', texts[idx]);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SVG 模拟指针时钟</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      padding: 24px;
+      background: linear-gradient(160deg, #0b1120, #111a33);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #e2e8f0;
+    }
+
+    h1 { font-size: 18px; margin: 0; }
+    .sub { font-size: 13px; color: #64748b; margin: -14px 0 0; }
+
+    .clock-wrap {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      filter: drop-shadow(0 24px 44px rgba(0, 0, 0, 0.5));
+    }
+
+    svg { display: block; width: 100%; height: 100%; }
+
+    .face { fill: #0f172a; stroke: #334155; stroke-width: 3; }
+
+    .tick { stroke: #475569; stroke-width: 2; stroke-linecap: round; }
+    .tick.major { stroke: #94a3b8; stroke-width: 4; }
+
+    .num {
+      fill: #cbd5e1;
+      font-size: 20px;
+      font-weight: 700;
+      font-family: system-ui, sans-serif;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+
+    /* 指针：transform-origin 在表盘中心 (150,150) */
+    .hand {
+      transform-origin: 150px 150px;
+      stroke-linecap: round;
+    }
+
+    .hour { stroke: #e2e8f0; stroke-width: 7; }
+    .minute { stroke: #a5b4fc; stroke-width: 5; }
+    /* 秒针平滑扫动（每帧微转，而非每秒跳一格） */
+    .second { stroke: #f43f5e; stroke-width: 2.5; }
+
+    .pin-outer { fill: #f43f5e; }
+    .pin-inner { fill: #e2e8f0; }
+
+    .digital {
+      font-variant-numeric: tabular-nums;
+      font-size: 17px;
+      letter-spacing: 3px;
+      color: #94a3b8;
+      font-family: ui-monospace, Menlo, monospace;
+    }
+
+    .digital b { color: #67e8f9; font-weight: 600; }
+
+    .ctrl { display: flex; gap: 10px; }
+
+    .ctrl button {
+      padding: 9px 22px;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ctrl button:hover { background: #334155; border-color: #67e8f9; }
+    .ctrl button.on { border-color: #f43f5e; color: #fda4af; }
+
+    .tip { font-size: 12px; color: #475569; text-align: center; max-width: 520px; line-height: 1.9; margin: 0; }
+    .tip code { color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <h1>SVG 模拟指针时钟</h1>
+  <p class="sub">秒针按 requestAnimationFrame 平滑扫动，支持显示 / 隐藏秒针</p>
+
+  <div class="clock-wrap">
+    <svg viewBox="0 0 300 300">
+      <circle class="face" cx="150" cy="150" r="140" />
+
+      <!-- 刻度：60 格，每 5 格一根长刻度 -->
+      <g id="ticks"></g>
+
+      <!-- 数字 12 3 6 9 -->
+      <text class="num" x="150" y="42">12</text>
+      <text class="num" x="258" y="150">3</text>
+      <text class="num" x="150" y="258">6</text>
+      <text class="num" x="42" y="150">9</text>
+
+      <!-- 指针 -->
+      <line class="hand hour"   id="hour"   x1="150" y1="150" x2="150" y2="82" />
+      <line class="hand minute" id="minute" x1="150" y1="150" x2="150" y2="52" />
+      <line class="hand second" id="second" x1="150" y1="164" x2="150" y2="38" />
+
+      <circle class="pin-outer" cx="150" cy="150" r="7" />
+      <circle class="pin-inner" cx="150" cy="150" r="3" />
+    </svg>
+  </div>
+
+  <div class="digital" id="digital">--:--:--</div>
+
+  <div class="ctrl">
+    <button id="secToggle" class="on">秒针：显示</button>
+    <button id="zone">时区：本地</button>
+  </div>
+
+  <p class="tip">
+    每帧用 <code>rotate(角度)</code> 设置 <code>transform</code>（SVG 元素原生支持 CSS transform），
+    秒针角度 = (秒 + 毫秒/1000) × 6°，因此是连续扫动而非跳秒。
+  </p>
+
+  <script>
+    // 生成刻度
+    var ticks = document.getElementById('ticks');
+    for (var i = 0; i < 60; i++) {
+      var angle = i * 6 * Math.PI / 180;
+      var major = i % 5 === 0;
+      var r1 = major ? 118 : 124;
+      var r2 = 132;
+      var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', (150 + Math.sin(angle) * r1).toFixed(2));
+      line.setAttribute('y1', (150 - Math.cos(angle) * r1).toFixed(2));
+      line.setAttribute('x2', (150 + Math.sin(angle) * r2).toFixed(2));
+      line.setAttribute('y2', (150 - Math.cos(angle) * r2).toFixed(2));
+      line.setAttribute('class', 'tick' + (major ? ' major' : ''));
+      ticks.appendChild(line);
+    }
+
+    var hourEl = document.getElementById('hour');
+    var minuteEl = document.getElementById('minute');
+    var secondEl = document.getElementById('second');
+    var digital = document.getElementById('digital');
+
+    var showSec = true;
+    var offsetMin = 0;      // 演示用：时区偏移（分钟）
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function frame() {
+      var now = new Date(Date.now() + offsetMin * 60000);
+
+      var ms = now.getMilliseconds();
+      var s = now.getSeconds() + ms / 1000;      // 平滑秒
+      var m = now.getMinutes() + s / 60;
+      var h = (now.getHours() % 12) + m / 60;
+
+      hourEl.style.transform = 'rotate(' + (h * 30) + 'deg)';
+      minuteEl.style.transform = 'rotate(' + (m * 6) + 'deg)';
+      secondEl.style.transform = 'rotate(' + (s * 6) + 'deg)';
+
+      digital.innerHTML =
+        '<b>' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds()) + '</b>' +
+        ' .' + String(ms).padStart(3, '0');
+
+      requestAnimationFrame(frame);
+    }
+
+    document.getElementById('secToggle').addEventListener('click', function () {
+      showSec = !showSec;
+      secondEl.style.display = showSec ? '' : 'none';
+      this.textContent = '秒针：' + (showSec ? '显示' : '隐藏');
+      this.classList.toggle('on', showSec);
+    });
+
+    var zones = [0, 60, -60, 480];   // UTC / +1h / -1h / 北京时间(相对 UTC+8 的演示偏移简化)
+    var zoneIdx = 0;
+    var zoneNames = ['本地', 'UTC+1', 'UTC-1', '东八区'];
+
+    document.getElementById('zone').addEventListener('click', function () {
+      zoneIdx = (zoneIdx + 1) % zones.length;
+      offsetMin = zones[zoneIdx];
+      this.textContent = '时区：' + zoneNames[zoneIdx];
+    });
+
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>极光背景</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #04070f;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #e2e8f0;
+    }
+
+    .scene {
+      position: relative;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      text-align: center;
+      padding: 24px;
+      isolation: isolate;
+    }
+
+    /* 三层极光带：大椭圆渐变 + 模糊，缓慢漂移旋转 */
+    .aurora {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.55;
+      mix-blend-mode: screen;
+      z-index: -1;
+      will-change: transform;
+    }
+
+    .a1 {
+      width: 70vw;
+      height: 42vh;
+      left: -12vw;
+      top: 8vh;
+      background: radial-gradient(ellipse at center, #22c55e 0%, transparent 68%);
+      animation: drift1 16s ease-in-out infinite alternate;
+    }
+
+    .a2 {
+      width: 62vw;
+      height: 46vh;
+      right: -14vw;
+      top: 22vh;
+      background: radial-gradient(ellipse at center, #06b6d4 0%, transparent 68%);
+      animation: drift2 21s ease-in-out infinite alternate;
+    }
+
+    .a3 {
+      width: 58vw;
+      height: 38vh;
+      left: 16vw;
+      bottom: -6vh;
+      background: radial-gradient(ellipse at center, #8b5cf6 0%, transparent 70%);
+      animation: drift3 18s ease-in-out infinite alternate;
+    }
+
+    .a4 {
+      width: 36vw;
+      height: 26vh;
+      left: 32vw;
+      top: 4vh;
+      background: radial-gradient(ellipse at center, #f472b6 0%, transparent 70%);
+      opacity: 0.35;
+      animation: drift2 24s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes drift1 {
+      from { transform: translate(-4%, -6%) rotate(-8deg) scale(1); }
+      to   { transform: translate(10%, 8%) rotate(6deg) scale(1.18); }
+    }
+
+    @keyframes drift2 {
+      from { transform: translate(6%, 4%) rotate(7deg) scale(1.1); }
+      to   { transform: translate(-8%, -8%) rotate(-6deg) scale(0.94); }
+    }
+
+    @keyframes drift3 {
+      from { transform: translate(4%, 8%) rotate(-5deg) scale(0.96); }
+      to   { transform: translate(-10%, -6%) rotate(9deg) scale(1.2); }
+    }
+
+    /* 星星 */
+    .stars {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background-image:
+        radial-gradient(1.4px 1.4px at 12% 22%, #fff, transparent),
+        radial-gradient(1.2px 1.2px at 78% 14%, #fff, transparent),
+        radial-gradient(1.6px 1.6px at 42% 68%, #dbeafe, transparent),
+        radial-gradient(1.2px 1.2px at 88% 56%, #fff, transparent),
+        radial-gradient(1.4px 1.4px at 26% 84%, #fff, transparent),
+        radial-gradient(1.1px 1.1px at 62% 34%, #fff, transparent),
+        radial-gradient(1.3px 1.3px at 6% 58%, #fff, transparent),
+        radial-gradient(1.2px 1.2px at 54% 90%, #fff, transparent);
+      background-size: 300px 300px, 360px 360px, 420px 420px, 320px 320px,
+                      380px 380px, 340px 340px, 400px 400px, 360px 360px;
+      opacity: 0.7;
+      animation: twinkle 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes twinkle {
+      from { opacity: 0.45; }
+      to { opacity: 0.85; }
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 6vw, 54px);
+      font-weight: 800;
+      background: linear-gradient(90deg, #86efac, #67e8f9, #c4b5fd);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 60px rgba(103, 232, 249, 0.25);
+    }
+
+    p {
+      margin: 0;
+      max-width: 540px;
+      font-size: 14px;
+      line-height: 2;
+      color: rgba(203, 213, 225, 0.82);
+    }
+
+    .ctrl { display: flex; gap: 10px; margin-top: 8px; }
+
+    .ctrl button {
+      padding: 9px 22px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.55);
+      color: #cbd5e1;
+      font-size: 13px;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      transition: all 0.2s;
+    }
+
+    .ctrl button:hover { border-color: #67e8f9; color: #a5f3fc; }
+    .ctrl button.off { opacity: 0.5; }
+
+    .tip {
+      position: absolute;
+      bottom: 16px;
+      font-size: 11px;
+      color: rgba(148, 163, 184, 0.55);
+    }
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <div class="stars"></div>
+    <div class="aurora a1" id="a1"></div>
+    <div class="aurora a2" id="a2"></div>
+    <div class="aurora a3" id="a3"></div>
+    <div class="aurora a4" id="a4"></div>
+
+    <h1>极光背景</h1>
+    <p>
+      四层大椭圆渐变配合 <code>filter: blur(70px)</code> 与 <code>mix-blend-mode: screen</code>，
+      以不同周期的位移 + 缓慢旋转交替漂移，形成持续流动的极光带。
+    </p>
+
+    <div class="ctrl">
+      <button id="speed">切换：慢速</button>
+      <button id="pause">暂停动画</button>
+    </div>
+
+    <div class="tip">纯 CSS 实现 · 无 Canvas · 无外部依赖</div>
+  </div>
+
+  <script>
+    var layers = ['a1', 'a2', 'a3', 'a4'].map(function (id) {
+      return document.getElementById(id);
+    });
+
+    var slow = false;
+    var paused = false;
+
+    document.getElementById('speed').addEventListener('click', function () {
+      slow = !slow;
+      layers.forEach(function (el) {
+        el.style.animationDuration = slow
+          ? (parseFloat(getComputedStyle(el).animationDuration) * 2.4 || 40) + 's'
+          : '';
+        // animationDuration 读出是秒，慢速时直接给固定倍数
+        el.style.animationDuration = slow
+          ? (['16s', '21s', '18s', '24s'][layers.indexOf(el)]) .replace(/^(\d+)s$/, function (_, n) {
+              return (Number(n) * 2.4).toFixed(1) + 's';
+            })
+          : '';
+      });
+      this.textContent = slow ? '切换：常速' : '切换：慢速';
+      this.classList.toggle('off', slow);
+    });
+
+    document.getElementById('pause').addEventListener('click', function () {
+      paused = !paused;
+      layers.forEach(function (el) {
+        el.style.animationPlayState = paused ? 'paused' : 'running';
+      });
+      document.querySelector('.stars').style.animationPlayState = paused ? 'paused' : 'running';
+      this.textContent = paused ? '▶ 继续动画' : '⏸ 暂停动画';
+      this.classList.toggle('off', paused);
+    });
+  </script>
+</body>
+</html>

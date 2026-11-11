@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>光晕跟随光标</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #05060f;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    /* 大光晕：慢速跟随，混合模式发光 */
+    .glow {
+      position: fixed;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.35), transparent 65%);
+      filter: blur(18px);
+      transform: translate(-50%, -50%);
+      z-index: 1;
+    }
+
+    /* 中环：较快跟随 */
+    .ring {
+      position: fixed;
+      width: 56px;
+      height: 56px;
+      border: 2px solid rgba(103, 232, 249, 0.75);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: width 0.25s, height 0.25s, border-color 0.25s;
+      z-index: 2;
+    }
+
+    /* 实心点：精确跟随 */
+    .dot {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #f0abfc;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 12px #f0abfc;
+      z-index: 3;
+    }
+
+    /* 悬停在可点元素上时，中环放大 */
+    .ring.hot {
+      width: 84px;
+      height: 84px;
+      border-color: rgba(244, 114, 182, 0.9);
+    }
+
+    .content {
+      position: relative;
+      z-index: 4;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      text-align: center;
+      padding: 24px;
+      pointer-events: none;
+    }
+
+    .content h1 {
+      margin: 0;
+      font-size: 26px;
+      background: linear-gradient(90deg, #a5b4fc, #67e8f9, #f0abfc);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: shine 5s linear infinite;
+    }
+
+    @keyframes shine {
+      from { background-position: 0% 0; }
+      to { background-position: 200% 0; }
+    }
+
+    .content p {
+      margin: 0;
+      max-width: 460px;
+      font-size: 13px;
+      line-height: 1.9;
+      color: #94a3b8;
+    }
+
+    .btn {
+      pointer-events: auto;
+      padding: 11px 30px;
+      border: 1px solid rgba(165, 180, 252, 0.5);
+      border-radius: 999px;
+      background: rgba(99, 102, 241, 0.16);
+      color: #e0e7ff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.15s;
+    }
+
+    .btn:hover { background: rgba(99, 102, 241, 0.34); transform: translateY(-2px); }
+
+    .tip {
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: #475569;
+      z-index: 4;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="glow" id="glow"></div>
+  <div class="ring" id="ring"></div>
+  <div class="dot" id="dot"></div>
+
+  <div class="content">
+    <h1>光晕跟随光标</h1>
+    <p>三层光标以不同插值系数跟随鼠标：光晕最慢营造氛围，圆环居中且悬停可点元素时放大，实心点精确同步。</p>
+    <button class="btn" id="btn">悬停我试试</button>
+  </div>
+
+  <div class="tip">三层 lerp 插值 · mix 混合发光 · 悬停状态放大</div>
+
+  <script>
+    var glow = document.getElementById('glow');
+    var ring = document.getElementById('ring');
+    var dot = document.getElementById('dot');
+    var btn = document.getElementById('btn');
+
+    var mouse = { x: innerWidth / 2, y: innerHeight / 2 };
+    // 各层当前位置（从视口中心出发）
+    var g = { x: mouse.x, y: mouse.y };
+    var r = { x: mouse.x, y: mouse.y };
+
+    document.addEventListener('mousemove', function (e) {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      // 实心点直接同步
+      dot.style.left = mouse.x + 'px';
+      dot.style.top = mouse.y + 'px';
+    });
+
+    // 悬停可点元素时圆环放大
+    document.addEventListener('mouseover', function (e) {
+      if (e.target.closest('button, a')) ring.classList.add('hot');
+    });
+    document.addEventListener('mouseout', function (e) {
+      if (e.target.closest('button, a')) ring.classList.remove('hot');
+    });
+
+    function lerp(a, b, n) { return a + (b - a) * n; }
+
+    function loop() {
+      // 光晕 0.07（最慢）、圆环 0.18（较快）
+      g.x = lerp(g.x, mouse.x, 0.07);
+      g.y = lerp(g.y, mouse.y, 0.07);
+      r.x = lerp(r.x, mouse.x, 0.18);
+      r.y = lerp(r.y, mouse.y, 0.18);
+
+      glow.style.left = g.x + 'px';
+      glow.style.top = g.y + 'px';
+      ring.style.left = r.x + 'px';
+      ring.style.top = r.y + 'px';
+
+      requestAnimationFrame(loop);
+    }
+
+    loop();
+
+    btn.addEventListener('click', function () {
+      // 点击时圆环脉冲一次
+      ring.animate(
+        [
+          { transform: 'translate(-50%,-50%) scale(1)', borderColor: 'rgba(103,232,249,0.75)' },
+          { transform: 'translate(-50%,-50%) scale(2.2)', borderColor: 'rgba(244,114,182,0.9)' },
+          { transform: 'translate(-50%,-50%) scale(1)', borderColor: 'rgba(103,232,249,0.75)' }
+        ],
+        { duration: 500, easing: 'ease-out' }
+      );
+    });
+  </script>
+</body>
+</html>

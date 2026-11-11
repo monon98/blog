@@ -28,7 +28,7 @@ sidebar: false
 
 6. [第一组 · 与已有文章联动](./article) 扩展卡片 / visibilitychange / BFC / 盒模型 / CSS 选择器
 
-7. [第二组 · 纯视觉特效](./visual) 视差 / 粒子 / 翻转 / 波浪 / 跑马灯 / 频谱 / 打字机 / 磁吸等 11 个案例
+7. [第二组 · 纯视觉特效](./visual) 视差 / 粒子 / 翻转 / 极光 / 霓虹 / 描边 / Loader / 倾斜卡等 32 个案例
 
 8. [第三组 · 面试题联动](./interview) 防抖节流 / Event Loop / 虚拟列表 / 图片懒加载 / Promise 链
 
