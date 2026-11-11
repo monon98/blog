@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>图片加载失败兜底指令</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@3.4.38/dist/vue.global.prod.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #f8fafc;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #1e293b;
+    }
+
+    h1 { font-size: 17px; margin: 0 0 4px; }
+    .sub { font-size: 13px; color: #64748b; margin: 0 0 16px; line-height: 1.7; }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar button {
+      padding: 9px 20px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .toolbar button:hover { border-color: #2563eb; color: #2563eb; }
+    .toolbar button.primary {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #fff;
+    }
+    .toolbar button.primary:hover { background: #1d4ed8; color: #fff; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 14px;
+    }
+
+    .cell {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .cell .cap {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .cell img,
+    .cell .fallback {
+      width: 100%;
+      height: 110px;
+      object-fit: cover;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #fff;
+    }
+
+    .note {
+      margin-top: 18px;
+      padding: 12px 16px;
+      background: #0f172a;
+      color: #cbd5e1;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.9;
+      font-family: ui-monospace, Menlo, monospace;
+    }
+
+    .note b { color: #7dd3fc; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>图片加载失败兜底指令 v-img-fallback</h1>
+    <p class="sub">
+      图片加载失败时自动替换为带背景色的占位块；通过 MutationObserver 监听 src 变化，
+      src 切换后会重新校验并恢复显示。
+    </p>
+
+    <div class="toolbar">
+      <button class="primary" @click="toggleAll">{{ broken ? '全部恢复正常图片' : '全部换成失效链接' }}</button>
+      <button @click="cycle">逐个切换下一张</button>
+    </div>
+
+    <div class="grid">
+      <div class="cell" v-for="(item, i) in items" :key="i">
+        <img
+          v-img-fallback="item.color"
+          :src="broken ? item.bad : item.good"
+          :width="150"
+          :height="110"
+          :alt="item.name"
+        />
+        <div class="cap">{{ item.name }}</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <b>指令核心逻辑：</b><br />
+      mounted 时复制 img 的属性创建占位 div 并插入其前方，给 img 绑定 onerror 切换显示；<br />
+      再用 <b>MutationObserver</b> 监听 src 属性，src 变化后先恢复 img，再用 new Image() 预加载校验，
+      失败则重新切回占位块；beforeUnmount 中 disconnect 清理观察者。
+    </div>
+  </div>
+
+  <script>
+    // ===== 指令源码（来自 src/html/imgFallback.js.js，仅把 export 改为挂载到全局）=====
+    const imgFallback = {
+      mounted(el, binding) {
+        const fallbackColor = binding.value || '#f0f0f0';
+
+        const fallbackDiv = document.createElement('div');
+        fallbackDiv.className = el.className;
+
+        Array.from(el.attributes).forEach(attr => {
+          fallbackDiv.setAttribute(attr.name, attr.value);
+        });
+
+        fallbackDiv.style.width = `${el.width}px`;
+        fallbackDiv.style.height = `${el.height}px`;
+        fallbackDiv.style.backgroundColor = fallbackColor;
+        fallbackDiv.style.justifyContent = 'center';
+        fallbackDiv.style.alignItems = 'center';
+        fallbackDiv.style.position = 'relative';
+        fallbackDiv.style.display = 'flex';
+        fallbackDiv.style.borderRadius = '6px';
+        fallbackDiv.style.fontSize = '12px';
+        fallbackDiv.style.color = '#fff';
+        fallbackDiv.textContent = '图片加载失败';
+
+        el.parentNode.insertBefore(fallbackDiv, el);
+
+        const handleError = () => {
+          el.style.display = 'none';
+          fallbackDiv.style.display = 'flex';
+        };
+
+        el.onerror = handleError;
+        el.src = el.src || '';
+
+        const observer = new MutationObserver(mutations => {
+          mutations.forEach(mutation => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+              el.style.display = 'block';
+              fallbackDiv.style.display = 'none';
+
+              const img = new Image();
+              img.src = el.src;
+              img.onload = () => {
+                el.style.display = 'block';
+                fallbackDiv.style.display = 'none';
+              };
+              img.onerror = handleError;
+            }
+          });
+        });
+
+        observer.observe(el, { attributes: true });
+        el._observer = observer;
+      },
+      beforeUnmount(el) {
+        if (el._observer) {
+          el._observer.disconnect();
+          delete el._observer;
+        }
+      }
+    };
+
+    // ===== Demo 数据（图片全部用内联 SVG data URI，无外部图床依赖）=====
+    function svg(color, label) {
+      const s =
+        '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="220">' +
+        '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
+        '<stop offset="0%" stop-color="' + color[0] + '"/>' +
+        '<stop offset="100%" stop-color="' + color[1] + '"/>' +
+        '</linearGradient></defs>' +
+        '<rect width="300" height="220" fill="url(#g)"/>' +
+        '<circle cx="240" cy="50" r="60" fill="rgba(255,255,255,0.2)"/>' +
+        '<text x="150" y="115" fill="rgba(255,255,255,0.95)" font-size="30" ' +
+        'font-family="system-ui,sans-serif" text-anchor="middle">' + label + '</text>' +
+        '</svg>';
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s);
+    }
+
+    const items = [
+      { name: '渐变 A', color: '#6366f1,#a855f7', good: svg(['#6366f1', '#a855f7'], 'A'), bad: '/broken/404-a.png' },
+      { name: '渐变 B', color: '#0ea5e9,#22d3ee', good: svg(['#0ea5e9', '#22d3ee'], 'B'), bad: '/broken/404-b.png' },
+      { name: '渐变 C', color: '#f59e0b,#ef4444', good: svg(['#f59e0b', '#ef4444'], 'C'), bad: '/broken/404-c.png' },
+      { name: '渐变 D', color: '#10b981,#84cc16', good: svg(['#10b981', '#84cc16'], 'D'), bad: '/broken/404-d.png' },
+      { name: '渐变 E', color: '#ec4899,#f97316', good: svg(['#ec4899', '#f97316'], 'E'), bad: '/broken/404-e.png' },
+      { name: '渐变 F', color: '#8b5cf6,#6366f1', good: svg(['#8b5cf6', '#6366f1'], 'F'), bad: '/broken/404-f.png' }
+    ];
+
+    const app = Vue.createApp({
+      setup() {
+        const broken = Vue.ref(false);
+        const toggleAll = () => { broken.value = !broken.value; };
+        const cycle = () => { broken.value = !broken.value; };
+        return { items, broken, toggleAll, cycle };
+      }
+    });
+
+    app.directive('img-fallback', imgFallback);
+    app.mount('#app');
+  </script>
+</body>
+</html>

@@ -8,7 +8,7 @@ sidebar: false
 <Info></Info>
 
 <script setup>
-import Info from '@components/info.vue'
+import Info from '@components/widget/info.vue'
 </script>
 
 <style module>

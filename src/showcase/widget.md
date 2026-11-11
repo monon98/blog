@@ -44,9 +44,51 @@ sidebar: false
 
 <InfiniteScroll :total="120" :page-size="15" />
 
+---
+
+## 原有案例（归档至本组）
+
+### 7. 画布绘图（Vue 组件）
+
+<DrawCanvas :width="560" :height="300" backgroundColor="#ffffff" color="#000000" borderColor="red" />
+
+### 8. 浏览器信息展示（Vue 组件）
+
+<Info />
+
+### 9. 输入框标签效果（原生 HTML）
+
+<HtmlFrame src="html/widget/floating-label.html" title="输入框标签效果" :height="460" />
+
+### 10. Vue3 自适应高度 Input（原生 HTML）
+
+<HtmlFrame src="html/widget/auto-resize-input.html" title="Vue3 自适应高度 Input" :height="460" />
+
+### 11. Vue3 自适应高度 Textarea（原生 HTML）
+
+<HtmlFrame src="html/widget/auto-resize-textarea.html" title="Vue3 自适应高度 Textarea" :height="520" />
+
+### 12. Vue2 行级拖拽排序（原生 HTML）
+
+<HtmlFrame src="html/widget/vue2-row-drag-sort.html" title="Vue2 行级拖拽排序" :height="560" />
+
+### 13. Vue2 合并相同单元格（原生 HTML）
+
+<HtmlFrame src="html/widget/vue2-merge-cells.html" title="Vue2 合并相同单元格" :height="560" />
+
+### 14. Mermaid 流程图（原生 HTML）
+
+<HtmlFrame src="html/widget/mermaid-flowchart.html" title="Mermaid 流程图" :height="560" />
+
+### 15. 图片加载失败兜底指令（原生 HTML）
+
+<HtmlFrame src="html/widget/img-fallback.html" title="图片加载失败兜底指令" :height="640" />
+
 <script setup>
 import HtmlFrame from '@components/html-frame.vue'
 import Toast from '@components/widget/toast.vue'
 import ContextMenu from '@components/widget/context-menu.vue'
 import InfiniteScroll from '@components/widget/infinite-scroll.vue'
+import DrawCanvas from '@components/widget/draw-canvas.vue'
+import Info from '@components/widget/info.vue'
 </script>

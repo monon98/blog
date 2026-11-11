@@ -35,10 +35,10 @@ sidebar: false
 9. [第四组 · 实用交互组件](./widget) 滑块验证码 / 可拖拽分栏 / 下拉刷新 / Toast / 右键菜单 / 无限滚动
 
 <script setup>
-import Snowflakes from '@components/snowflakes.vue';
-import RandomScroll from '@components/random-scroll.vue';
-import DrawCanvas from '@components/draw-canvas.vue';
-import HoverButton from '@components/hover-button.vue';
+import Snowflakes from '@components/visual/snowflakes.vue';
+import RandomScroll from '@components/visual/random-scroll.vue';
+import DrawCanvas from '@components/widget/draw-canvas.vue';
+import HoverButton from '@components/visual/hover-button.vue';
 
 const width = typeof window !== 'undefined' ? window.innerWidth * 0.7 : 800;
 

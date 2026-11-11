@@ -74,10 +74,35 @@ Web Audio API 合成音序（无外部音频文件）+ `AnalyserNode` 实时频�
 
 <Skeleton />
 
+---
+
+## 原有案例（归档至本组）
+
+### 12. CSS 镂空遮罩（原生 HTML）
+
+<HtmlFrame src="html/visual/css-mask.html" title="CSS 镂空遮罩" :height="460" />
+
+### 13. 雪花飘落（Vue 组件）
+
+<Snowflakes :width="640" :height="180" :count="60" x="center" color="skyblue" :maxSpeed="1" />
+
+### 14. 滚动字符（Vue 组件）
+
+<div style="min-height: 130px;">
+  <RandomScroll :immediate="true" />
+</div>
+
+### 15. 悬浮按钮（Vue 组件）
+
+<HoverButton text="hover me" />
+
 <script setup>
 import HtmlFrame from '@components/html-frame.vue'
 import Typewriter from '@components/visual/typewriter.vue'
 import RippleButton from '@components/visual/ripple-button.vue'
 import MagneticButton from '@components/visual/magnetic-button.vue'
 import Skeleton from '@components/visual/skeleton.vue'
+import Snowflakes from '@components/visual/snowflakes.vue'
+import RandomScroll from '@components/visual/random-scroll.vue'
+import HoverButton from '@components/visual/hover-button.vue'
 </script>
