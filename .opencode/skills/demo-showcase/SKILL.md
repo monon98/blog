@@ -167,6 +167,12 @@ const value = 100
 6. [组名](./<group>) 一句话说明
 ```
 
+每个案例演示行之后追加详情页入口（编号与详情页一致）：
+
+```md
+[完整页面：用例 · 代码 · 讲解 →](./<group>/01-<name>)
+```
+
 ## 8. `HtmlFrame` 组件（`src/components/html-frame.vue`）
 
 内嵌原生 HTML 的统一封装，内部规范化路径后用 `withBase()` 补全 base（注意：`withBase` 只对以 `/` 开头的路径补 base）。
@@ -202,4 +208,64 @@ const value = 100
 - [ ] `HtmlFrame` 的 `src` 不含 `/blog/` 前缀、不以 `/` 开头
 - [ ] `:height` 按内容设置，iframe 无大片空白或截断
 - [ ] 已追加到 `src/showcase/<group>.md` 并在 `index.md` 注册
+- [ ] 案例有对应详情页 `src/showcase/<group>/NN-<name>.md`，分组页有「完整页面 →」链接
 - [ ] `pnpm build` 通过（构建期校验死链）
+
+## 11. 详情页模板 `src/showcase/<group>/NN-<name>.md`
+
+每个案例配一个**独立详情页**（展示用例 + 代码实现 + 使用讲解），与分组页共存、由分组页链接进入：
+
+```md
+---
+layout: doc
+navbar: true
+sidebar: false
+---
+
+# NN. 中文标题（形态）
+
+← [返回<组名>列表](../<group>)
+
+（article / interview 组此处加：关联文章/题目：[标题](../../docs/...)）
+
+## 一、展示用例
+
+<!-- HTML 页： -->
+<HtmlFrame src="html/<group>/<name>.html" title="中文标题" :height="480" />
+<!-- Vue 页：直接放组件，如 <CaseB :prop="value" /> -->
+
+## 二、代码实现
+
+<!-- HTML 页：单文件自包含（样式与脚本全内联），整文件复制到任意项目即可运行。 -->
+<!-- Vue 页：`<script setup>` 单文件组件，仅依赖 `vue`，可直接复制到任意 Vue 3 项目。 -->
+
+::: details 展开完整源码
+<<< ../../public/html/<group>/<name>.html   （或 ../../components/<group>/<name>.vue）
+:::
+
+## 三、使用讲解
+
+### 实现原理
+
+- 3-5 条要点，基于真实源码写（真实函数名/参数名/数值），不编造。
+
+### 如何调整
+
+- 2-3 条：改哪些常量/结构可调行为。
+
+### 注意事项
+
+- 2-3 条：坑、兼容性、安全边界。
+
+<script setup>
+<!-- HTML 页：import HtmlFrame from '@components/html-frame.vue' -->
+<!-- Vue 页：import 目标组件，不 import HtmlFrame -->
+</script>
+```
+
+要点：
+
+- 路径基准是 `src/showcase/<group>/`：返回链接 `../<group>`，snippet 与关联文章用 `../../` 开头。
+- HTML 页与 Vue 页的二、三节首句固定文案不同（见模板内注释），底部 `<script setup>` 只 import 本页用到的组件。
+- 讲解每页约 60-90 行、中文；行内反引号代码含 `{{ }}` 必须用 `<span v-pre>` 包裹（围栏块与 `<<<` snippet 天然安全，无需处理）。
+- 编号 `NN-` 与分组页 `## N.` 案例顺序一一对应，分组页每个案例都要有对应详情页链接。
