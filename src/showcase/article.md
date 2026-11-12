@@ -16,6 +16,8 @@ sidebar: false
 
 <HtmlFrame src="html/article/flex-card.html" title="扩展卡片 Flexbox 过渡" :height="460" />
 
+[完整页面：用例 · 代码 · 讲解 →](./article/01-flex-card)
+
 ## 2. visibilitychange 后台检测（Vue 组件）
 
 关联文章：[001. h5后台切换检测利用visibilitychange的缺点分析](../docs/collection/reposts/前端/001.%20h5后台切换检测利用visibilitychange的缺点分析)
@@ -23,6 +25,8 @@ sidebar: false
 切换标签页或最小化窗口，实时统计隐藏次数与累计时长。
 
 <VisibilityDetect />
+
+[完整页面：用例 · 代码 · 讲解 →](./article/02-visibility-detect)
 
 ## 3. BFC 三大特性演示（原生 HTML）
 
@@ -32,6 +36,8 @@ sidebar: false
 
 <HtmlFrame src="html/article/bfc.html" title="BFC 演示" :height="780" />
 
+[完整页面：用例 · 代码 · 讲解 →](./article/03-bfc)
+
 ## 4. CSS 盒模型可视化（原生 HTML）
 
 关联文章：[007. 彻底搞懂 CSS 盒子模型](../docs/collection/reposts/前端/007.%20彻底搞懂%20CSS%20盒子模型：从%20content-box%20到%20border-box%20的实战指南)
@@ -40,6 +46,8 @@ sidebar: false
 
 <HtmlFrame src="html/article/box-model.html" title="CSS 盒模型可视化" :height="580" />
 
+[完整页面：用例 · 代码 · 讲解 →](./article/04-box-model)
+
 ## 5. CSS 选择器实战演示（原生 HTML）
 
 关联文章：[009. 《CSS 核心机制与选择器实战精要》](../docs/collection/reposts/前端/009.%20《CSS%20核心机制与选择器实战精要》)
@@ -47,6 +55,8 @@ sidebar: false
 点击选择器查看命中元素与匹配数量。
 
 <HtmlFrame src="html/article/css-selector.html" title="CSS 选择器实战演示" :height="580" />
+
+[完整页面：用例 · 代码 · 讲解 →](./article/05-css-selector)
 
 <script setup>
 import HtmlFrame from '@components/html-frame.vue'

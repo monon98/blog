@@ -16,6 +16,8 @@ sidebar: false
 
 <DebounceThrottle />
 
+[完整页面：用例 · 代码 · 讲解 →](./interview/01-debounce-throttle)
+
 ## 2. Event Loop 执行顺序可视化（Vue 组件）
 
 关联笔记：[06. 事件循环](../docs/interview/06.%20browser/06.%20事件循环)
@@ -24,11 +26,15 @@ sidebar: false
 
 <EventLoop />
 
+[完整页面：用例 · 代码 · 讲解 →](./interview/02-event-loop)
+
 ## 3. 虚拟列表（Vue 组件）
 
 1 万条数据只渲染视口内几十个节点，实时显示渲染数量与 DOM 节省比例。
 
 <VirtualList :total="10000" :item-height="38" />
+
+[完整页面：用例 · 代码 · 讲解 →](./interview/03-virtual-list)
 
 ## 4. 图片懒加载 / 瀑布流（原生 HTML）
 
@@ -38,6 +44,8 @@ sidebar: false
 
 <HtmlFrame src="html/interview/lazyload.html" title="图片懒加载 / 瀑布流" :height="740" />
 
+[完整页面：用例 · 代码 · 讲解 →](./interview/04-lazyload)
+
 ## 5. Promise 链式调用演示（原生 HTML）
 
 关联题目：[19. 手写 Promise](../docs/interview/20.%20前端编程题/19.%20手写%20Promise)
@@ -45,6 +53,8 @@ sidebar: false
 分别点击 resolve / reject，观察值在链上的流转与 catch、finally 的执行时机。
 
 <HtmlFrame src="html/interview/promise-chain.html" title="Promise 链式调用演示" :height="820" />
+
+[完整页面：用例 · 代码 · 讲解 →](./interview/05-promise-chain)
 
 <script setup>
 import HtmlFrame from '@components/html-frame.vue'
