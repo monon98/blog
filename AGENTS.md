@@ -38,9 +38,9 @@ src/
     develop/        # 开发笔记 (有 index.md 落地页，nav 有「开发笔记」入口)
       汇总/         # 5 个收集类文件：技术栈 / 开发工具 / 开源资源 / 前端收藏箱 / 三方库依赖收集
       css/ javascript/ vue/ angular/ sql/ other/
-    guide/          # 技术导航
+    code/           # 面试代码题 (01. leetcode / 02. 前端编程题，已从 interview/ 独立成导航)
     interview/      # 面试题 (根目录只放 index.md + 0. 在线面试题网站收集 + 99. 其他面试难题汇总)
-      01-18 主题目录 / 19. leetcode / 20. 前端编程题 / 21. web3/ (01-04: web3基础、btc、eth、tron) / 25. webpack / 26. vite
+      01-18 主题目录 / 21. web3/ (01-04: web3基础、btc、eth、tron) / 25. webpack / 26. vite
   components/       # Vue components，按分组分子目录 (article/ visual/ interview/ widget/)
   html/             # （原指令源码已移除，并入 showcase/widget/15-img-fallback 关联的 HTML 案例）
   showcase/         # Demo showcase pages（每分组一个 <group>.md + index.md）

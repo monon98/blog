@@ -10,7 +10,7 @@ sidebar: false
 
 ## 1. 防抖 vs 节流演示（Vue 组件）
 
-关联题目：[17. 防抖函数 debounce](../docs/interview/20.%20前端编程题/17.%20防抖函数%20debounce) · [18. 节流函数 throttle](../docs/interview/20.%20前端编程题/18.%20节流函数%20throttle)
+关联题目：[17. 防抖函数 debounce](../docs/code/02.%20前端编程题/17.%20防抖函数%20debounce) · [18. 节流函数 throttle](../docs/code/02.%20前端编程题/18.%20节流函数%20throttle)
 
 在上方区域移动鼠标，对比原始事件数与实际处理次数的差异。
 
@@ -38,7 +38,7 @@ sidebar: false
 
 ## 4. 图片懒加载 / 瀑布流（原生 HTML）
 
-关联题目：[31. 图片懒加载](../docs/interview/20.%20前端编程题/31.%20图片懒加载)
+关联题目：[31. 图片懒加载](../docs/code/02.%20前端编程题/31.%20图片懒加载)
 
 `IntersectionObserver` 进入视口才给 `img.src` 赋值，图片用内联 SVG data URI，无外部依赖。
 
@@ -48,7 +48,7 @@ sidebar: false
 
 ## 5. Promise 链式调用演示（原生 HTML）
 
-关联题目：[19. 手写 Promise](../docs/interview/20.%20前端编程题/19.%20手写%20Promise)
+关联题目：[19. 手写 Promise](../docs/code/02.%20前端编程题/19.%20手写%20Promise)
 
 分别点击 resolve / reject，观察值在链上的流转与 catch、finally 的执行时机。
 

@@ -14,7 +14,7 @@ description: Use when creating new content directories or expanding existing one
 - Plan the directory structure and file count
 - Decide where it belongs:
   - `src/docs/interview/` — 面试题
-  - `src/docs/guide/` — 技术导航
+  - `src/docs/code/` — 面试代码题（LeetCode / 前端手写题）
   - `src/docs/develop/` — 开发笔记
   - `src/docs/collection/personal/` — 个人收藏
   - `src/docs/collection/reposts/` — 转载收藏

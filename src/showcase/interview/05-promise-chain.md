@@ -8,7 +8,7 @@ sidebar: false
 
 ← [返回面试题联动列表](../interview)
 
-关联题目：[19. 手写 Promise](../../docs/interview/20.%20前端编程题/19.%20手写%20Promise)
+关联题目：[19. 手写 Promise](../../docs/code/02.%20前端编程题/19.%20手写%20Promise)
 
 ## 一、展示用例
 

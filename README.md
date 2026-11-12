@@ -13,8 +13,8 @@
 │   ├── docs/             # 文档内容
 │   │   ├── collection/   # 收藏箱（个人 + 转载）
 │   │   ├── develop/      # 开发笔记
-│   │   ├── guide/        # 技术导航
-│   │   └── interview/    # 面试题（JS/TS/Vue/React/浏览器/Node/LeetCode/前端手写题等）
+│   │   ├── code/         # 面试代码题（LeetCode 初级算法 / 前端手写题）
+│   │   └── interview/    # 面试题（JS/TS/Vue/React/浏览器/Node 等）
 │   ├── components/       # Vue 组件
 │   └── index.md          # 首页
 ├── .github/workflows/    # GitHub Actions 部署

@@ -8,8 +8,8 @@ hero:
   tagline: Monon98的个人成长记录
   actions:
     - theme: brand
-      text: 技术导航
-      link: /docs/guide/
+      text: 面试代码题
+      link: /docs/code/
     # - theme: alt
     #   text: 实用工具
     #   link: /user/1
@@ -21,9 +21,9 @@ features:
   - title: 开发笔记
     details: 开发日常笔记与三方库收集
     link: /docs/develop/
-  - title: 技术导航
-    details: 技术导航汇总
-    link: /docs/guide/
+  - title: 面试代码题
+    details: LeetCode 算法题与手写编程题题解
+    link: /docs/code/
   - title: 面试题
     details: 面试难题总结&记录
     link: /docs/interview/0.%20在线面试题网站收集

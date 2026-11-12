@@ -76,11 +76,11 @@ export const sidebar = {
       items: generateSidebar("interview"),
     },
   ],
-  '/docs/guide/': [
+  '/docs/code/': [
     {
-      text: "技术导航",
+      text: "面试代码题",
       collapsed: false,
-      items: generateSidebar("guide"),
+      items: generateSidebar("code"),
     },
   ],
   '/docs/develop/': [

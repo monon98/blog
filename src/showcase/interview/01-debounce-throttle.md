@@ -8,7 +8,7 @@ sidebar: false
 
 ← [返回面试题联动列表](../interview)
 
-关联题目：[17. 防抖函数 debounce](../../docs/interview/20.%20前端编程题/17.%20防抖函数%20debounce) · [18. 节流函数 throttle](../../docs/interview/20.%20前端编程题/18.%20节流函数%20throttle)
+关联题目：[17. 防抖函数 debounce](../../docs/code/02.%20前端编程题/17.%20防抖函数%20debounce) · [18. 节流函数 throttle](../../docs/code/02.%20前端编程题/18.%20节流函数%20throttle)
 
 ## 一、展示用例
 

@@ -1,6 +1,6 @@
 ---
 name: vitepress-content
-description: Use when adding, editing, or managing markdown content files in this VitePress blog. Covers docs in src/docs/, showcase pages, and the home page. Front-load keywords: markdown, content, docs, collection, interview, guide, develop.
+description: Use when adding, editing, or managing markdown content files in this VitePress blog. Covers docs in src/docs/, showcase pages, and the home page. Front-load keywords: markdown, content, docs, collection, interview, code, develop.
 ---
 
 # VitePress Content Management
@@ -14,7 +14,7 @@ All content lives under `src/` (VitePress `srcDir`), NOT the repo root.
 | `src/docs/collection/personal/` | 个人收藏 (personal bookmarks) |
 | `src/docs/collection/reposts/` | 转载收藏 (reposted articles) |
 | `src/docs/develop/` | 开发笔记 (dev notes) |
-| `src/docs/guide/` | 技术导航 (tech guides) |
+| `src/docs/code/` | 面试代码题 (LeetCode 与前端手写编程题) |
 | `src/docs/interview/` | 面试题 (interview questions) |
 | `src/showcase/` | Demo showcase pages |
 | `src/index.md` | Home page (frontmatter layout) |
