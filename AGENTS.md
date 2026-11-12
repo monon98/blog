@@ -68,16 +68,21 @@ Sidebar in `.vitepress/sidebar.ts` auto-generates from the filesystem. File/dire
 ## Gotchas
 
 - 原生 HTML 案例必须放 `src/public/html/<group>/`（ASCII kebab-case）才能被 iframe 内嵌；`src/html/` 不进 dist，只剩一个 Vue 指令源码 `imgFallback.js.js`
-- 案例分组规范见 `.opencode/skills/demo-showcase/SKILL.md`（article / visual / interview / widget 四组）
+- 案例分组与详情页规范见 `.opencode/skills/demo-showcase/SKILL.md`（article / visual / interview / widget 四组；§11 详情页模板）
 - The `scripts/` directory is empty — don't rely on any script tooling
 - No `.env` files or environment variables configured
 - **`pnpm preview` 会缓存启动时刻的文件列表**：启动后新建的页面一律 404（症状像"没有构建出页面"）。重新 build 后必须重启 preview 才能看到新页面
 - **dev server（`pnpm dev`）遇文件变动会短暂 502 / 空白页**：浏览器验证时遇到空页先重试，不要误判为死链；5173 被占用时会自动落到 5174
 - PowerShell 输出中文文件名乱码：先 `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8`
+- **md 页面是整页编译成 Vue 模板**：正文行内反引号代码含 `{{ }}` 会被当插值执行（曾致 31 个详情页 SSR TypeError、文档页内容渲染成 `0`），必须用 `<span v-pre>` 包裹；围栏代码块与 `<<<` snippet 天然安全。改完 md 后 `pnpm build` 若退出码 0，仍要 grep 输出确认无 `TypeError`
 - 侧边栏每个子目录会显示一个多余的 "index" 条目（`index.md` 的既有行为），guide/interview 均如此，属已知非 bug
 
 ## Session history
 
+- `4b6c079` 案例展示详情页体系（demo-showcase Skill §11）：
+  - 四组 57 个案例全部配独立详情页 `src/showcase/<group>/NN-<name>.md`：visual 32（`faa0523`）+ article 5 / interview 5 / widget 15（`c44eed5`）；结构为 返回链接 →（关联文章/题目）→ 一、展示用例 → 二、代码实现（`::: details` + `<<<` 真实源文件）→ 三、使用讲解（实现原理/如何调整/注意事项，基于真实源码写）
+  - 分组页 `src/showcase/<group>.md` 每案例演示行下加 `[完整页面：用例 · 代码 · 讲解 →](./<group>/NN-name)`；`7c68348` 首页改为四组导航落地页
+  - Skill 新增 §11 详情页模板 + §7 分组页链接写法 + 质量清单项；讲解写法、HTML/Vue 页文案差异、`../../` 路径基准均入规范
 - `12eb19d` 整理内容目录结构并补充导航入口：
   - 「好用的三方库依赖收集」扩充至 22 分类约 150 库，unocss 归入新建的「CSS / 样式」分类
   - 新增 `develop/index.md` 落地页 + 导航「开发笔记」入口；修复首页 3 处坏链并新增开发笔记卡片
