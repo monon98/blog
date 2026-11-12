@@ -154,6 +154,6 @@ Detailed explanation见 [02. 生命周期.md](./02.%20生命周期)。
 
 ## Gotchas
 
-- Native HTML demos must live in `src/public/html/<group>/` to be embeddable — `src/html/` is not copied into dist (it only holds a Vue directive source `imgFallback.js.js`)
+- Native HTML demos must live in `src/public/html/<group>/` to be embeddable — `src/html/` is not copied into dist and no longer exists (the old `imgFallback.js.js` directive source was merged into `widget/img-fallback.html`)
 - Base path is `/blog/` — internal links should account for this
 - Do not edit `.vitepress/sidebar.ts` manually to add content — just add files to the filesystem

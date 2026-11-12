@@ -32,7 +32,7 @@ sidebar: false
 
 ### 如何调整
 
-- 注册方式在底部：`app.directive('img-fallback', imgFallback)`；拷到 SFC 项目后可抽成文件并 `export default`，或在 `main.ts` 里 `app.directive` 全局注册（原指令源码见 `src/html/imgFallback.js.js`）。
+- 注册方式在底部：`app.directive('img-fallback', imgFallback)`；拷到 SFC 项目后可抽成文件并 `export default`，或在 `main.ts` 里 `app.directive` 全局注册（指令源码即本页脚本 `imgFallback` 对象，可直接抽出）。
 - 占位块样式（圆角 6px、字号 12px、白色文字、「图片加载失败」文案）都是 `mounted` 里的行内 style，可换成传对象：`v-img-fallback="{ color, text }"` 后读 `binding.value.color`。
 - 观察其它属性变化：`MutationObserver` 的回调已判 `attributeName === 'src'`，放开即可监听全部属性。
 

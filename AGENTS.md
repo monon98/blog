@@ -42,7 +42,7 @@ src/
     interview/      # 面试题 (根目录只放 index.md + 0. 在线面试题网站收集 + 99. 其他面试难题汇总)
       01-18 主题目录 / 19. leetcode / 20. 前端编程题 / 21. web3/ (01-04: web3基础、btc、eth、tron) / 25. webpack / 26. vite
   components/       # Vue components，按分组分子目录 (article/ visual/ interview/ widget/)
-  html/             # 仅剩 imgFallback.js.js（Vue 指令源码，非 HTML demo）
+  html/             # （原指令源码已移除，并入 showcase/widget/15-img-fallback 关联的 HTML 案例）
   showcase/         # Demo showcase pages（每分组一个 <group>.md + index.md）
   public/
     html/<group>/   # 原生 HTML 案例，会被拷进 dist，可用 HtmlFrame iframe 内嵌
@@ -67,7 +67,7 @@ Sidebar in `.vitepress/sidebar.ts` auto-generates from the filesystem. File/dire
 
 ## Gotchas
 
-- 原生 HTML 案例必须放 `src/public/html/<group>/`（ASCII kebab-case）才能被 iframe 内嵌；`src/html/` 不进 dist，只剩一个 Vue 指令源码 `imgFallback.js.js`
+- 原生 HTML 案例必须放 `src/public/html/<group>/`（ASCII kebab-case）才能被 iframe 内嵌；`src/html/` 不进 dist 且目录已移除（原 `imgFallback.js.js` 指令源码并入 `widget/img-fallback.html`）
 - 案例分组与详情页规范见 `.opencode/skills/demo-showcase/SKILL.md`（article / visual / interview / widget 四组；§11 详情页模板）
 - The `scripts/` directory is empty — don't rely on any script tooling
 - No `.env` files or environment variables configured

@@ -16,5 +16,3 @@ sidebar: false
 ## 附录
 
 - [HtmlFrame 原生 HTML 内嵌示例](./html-frame) — `HtmlFrame` 组件用法，iframe 内嵌 `src/public/html/` 下的原生 HTML，自动补全 `/blog/` base
-- [雪花全屏演示](./snowflakes) — 独立全屏效果页
-- [画布绘图](./draw-canvas) — `DrawCanvas` 组件独立演示页（另见第四组第 7 个）
