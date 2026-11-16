@@ -22,7 +22,7 @@ features:
     details: 开发日常笔记与三方库收集
     link: /docs/develop/
   - title: 面试代码题
-    details: LeetCode 算法题与手写编程题题解
+    details: LeetCode 算法题、手写编程题与 SQL 数据库题题解
     link: /docs/code/
   - title: 面试题
     details: 面试难题总结&记录
