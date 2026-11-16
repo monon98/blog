@@ -38,7 +38,7 @@ src/
     develop/        # 开发笔记 (有 index.md 落地页，nav 有「开发笔记」入口)
       汇总/         # 5 个收集类文件：技术栈 / 开发工具 / 开源资源 / 前端收藏箱 / 三方库依赖收集
       css/ javascript/ vue/ angular/ sql/ other/
-    code/           # 面试代码题 (01. leetcode / 02. 前端编程题，已从 interview/ 独立成导航)
+    code/           # 面试代码题 (01. leetcode / 02. 前端编程题 / 03. 数据库编程题=LeetCode SQL 全量 323 题，已从 interview/ 独立成导航)
     interview/      # 面试题 (根目录只放 index.md + 0. 在线面试题网站收集 + 99. 其他面试难题汇总)
       01-18 主题目录 / 21. web3/ (01-04: web3基础、btc、eth、tron) / 25. webpack / 26. vite
   components/       # Vue components，按分组分子目录 (article/ visual/ interview/ widget/)
@@ -79,6 +79,12 @@ Sidebar in `.vitepress/sidebar.ts` auto-generates from the filesystem. File/dire
 
 ## Session history
 
+- `9161ff3` 面试代码题新增数据库编程题栏目：LeetCode SQL 全量 323 题题解：
+  - `src/docs/code/03. 数据库编程题/` 按 8 个知识点分目录：01. 基础查询(30) / 02. 多表连接(45) / 03. 聚合与分组(87) / 04. 子查询与 CTE(24) / 05. 窗口函数(40) / 06. 字符串与日期(36) / 07. 增删改操作(6) / 08. 综合与难题(55)，共 323 题（简单 113 / 中等 144 / 困难 66，含 VIP 付费题 218 道）+ 1 总索引 + 8 分类索引（由脚本生成）
+  - 每题页面结构：难度/标签/原题链接 → 题目描述（免费题用 leetcode.cn GraphQL 抓官方原文逐字保留；VIP 题 `translatedContent` 为 null，按表结构 + 测试数据补写并在页首加 VIP 标注引用块）→ 默认折叠的题解（思路 + MySQL 8 实现 + 复杂度）→ 建表与测试数据
+  - 全部 323 题的「建表造数 + 题解 SQL」在 Docker MySQL 8.4（容器 `lc-mysql`，端口 3307）逐一实测，**323/323 通过**；`pnpm build` exit=0 无死链无 TypeError，产出 332 个 HTML 页面
+  - 分批生产流程：题面抓取 → 两并行子代理按主要知识点分类 323 题 → 切 21 批（16 题/批）由子代理并行写题解 → 脚本全量校验 + 生成索引；期间多次触发 "Free usage limit reached" 免费额度限制，靠跨天重试完成
+  - 踩坑记录：① 目录误建在 `src/docs/03. ...` 导致 2 个死链，应放 `src/docs/code/03. ...`；② schemaSql 常见原样不可执行问题——表名大小写不一致（Create 与 Truncate/insert 大小写不同，Linux MySQL 区分大小写，如 3338、3415、3236、第二高的薪水 II）、字符串未转义单引号（2669、3087/3103/3150）、美式日期字面量被严格模式拒绝（607 销售员 `4/1/2006` → `2006-04-01`）、标题尾部空格（1082），均需人工修复后才可通过校验
 - `4b6c079` 案例展示详情页体系（demo-showcase Skill §11）：
   - 四组 57 个案例全部配独立详情页 `src/showcase/<group>/NN-<name>.md`：visual 32（`faa0523`）+ article 5 / interview 5 / widget 15（`c44eed5`）；结构为 返回链接 →（关联文章/题目）→ 一、展示用例 → 二、代码实现（`::: details` + `<<<` 真实源文件）→ 三、使用讲解（实现原理/如何调整/注意事项，基于真实源码写）
   - 分组页 `src/showcase/<group>.md` 每案例演示行下加 `[完整页面：用例 · 代码 · 讲解 →](./<group>/NN-name)`；`7c68348` 首页改为四组导航落地页
