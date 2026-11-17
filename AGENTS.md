@@ -81,6 +81,8 @@ Sidebar in `.vitepress/sidebar.ts` auto-generates from the filesystem. File/dire
 
 ## Session history
 
+- `e980012` 有声文章分段与小标题对齐：提取逻辑从 `textContent` 整块切分改为 TreeWalker 按文本节点遍历（`extractUnits`），块级祖先切换处断行、H1-H6 行标记为小标题并强制开新段（一个小标题起一段，段仍受 200 字上限约束，超长段句级续切）；`br` 替换为 `\n` 文本节点断行。dev 实测 21/21 小标题全部位于段首、播放正常零报错，preview 生产冒烟通过
+  - 附带结论：切倍速会重置本段进度 + 变化显示时长是 **Web Speech API 限制**——`utterance.rate` 在 `speak()` 后不可改（只能 cancel 重读），且 API 无播放位置接口（时长为库按字数÷语速估算）；如需进度连续可改为"倍速下一段生效"
 - `ea08719` 面试题文章新增「有声文章」：基于 `@leelaa/vitepress-plugin-extended` 的 ToSpeech 分段朗读播放器（`src/components/interview/article-speech.vue`）：
   - 定位：markdown-it 插件 `.vitepress/theme/ttsPlugin.ts` 在构建期向面试题文章首个 H1 的 `heading_close` 后注入 `<ArticleSpeech />`（主题 doc-before/doc-after 插槽在 H1 外侧不满足"标题下方"）；门禁双保险 = 插件 `env.relativePath.startsWith('docs/interview/')` + 组件 `route.data.relativePath`（`route.path` 含 `/blog/` base 不可用）
   - 多次合成：单 ToSpeech 实例动态换 `:text` 分段接力（≤200 字/段、句末标点切分），watch expose 的 `isPlaying` 由 true→false 且 phase 仍为 playing 时推进下一段；切倍速用 600ms 抑制窗防误跳段；8s `resume()` 心跳防 Chrome 长语音 15s 卡死
