@@ -81,6 +81,12 @@ Sidebar in `.vitepress/sidebar.ts` auto-generates from the filesystem. File/dire
 
 ## Session history
 
+- `5ae4c28` 有声文章按 H2 分章节：章节下拉 + 每个 H2 行内独立播放按钮（用户选定「并存都保留」+「标题行尾内联」）：
+  - 新增模块级共享 store `src/components/interview/speechStore.ts`（segments/segIndex/phase/rate/scope/chapters/ready + `actions.toggle` 由播放器挂载时注入），主播放器与 `h2-speech.vue` 按钮共用；H2 按钮经 `toggleH2(k)` 指挥：非当前章 = 改 scope（播放器内 watch 执行跳转开播），当前章 = 暂停/继续；朗读中该章按钮高亮 ⏸️
+  - `ttsPlugin.ts` 重写：向每个 h2 的 `heading_close` **前**注入 `<H2Speech :index="k" />`（组件在标题行尾；k=token 顺序=DOM 顺序）；注入点在 inline token 之后，VitePress TOC/slug 只读 heading_open+inline → 侧边栏/目录不受影响（已实测）
+  - H2 文档序号 → 章节下标换算：`introOffset`（首段非 h2Start 即有开篇章则 +1）；章节下拉 `<select>` 用 `:value` + `@change`（**原生 select 上 `:model-value` 无效**，不驱动选中项）
+  - 踩坑 3 处：① 原生 `<select>` 绑定须 `:value`+`@change`，`:model-value` 是组件 v-model 语义、对原生元素不生效；② 引擎 voice 冷启动期（~2.5s）`pause()` 因库 `isPlaying=false` 静默失效 → watch `isPlaying` 转 true 且 phase 仍为 paused 时补一次 `pause()`；③ **speechSynthesis 是浏览器全局**，跨测试遗留的 paused/卡死状态（cancel() 不清 paused 标志、被取消 utterance 使 speaking 卡 true）会让新 utterance 排队永不启动（onstart 不触发、进度冻结 0:00）→ 每次开播/接力前 `primeEngine()`（cancel + 必要时 resume；恢复路径不调用以免重读本段）
+  - 实测 dev 全矩阵过：启动/暂停(pd=true)/恢复/开篇「已读完」/切章/倍速不跳段/停止、全文 1.6s 自然进 2/21 段接力、切页停播+store 复位、非面试题页无残留、TOC 无污染、vue/01 4 h2=4 按钮、vue/02 行内按钮截图视觉确认；`pnpm build` exit=0，preview 生产冒烟（章节点击播放/暂停/6 项下拉/零报错）通过
 - `e980012` 有声文章分段与小标题对齐：提取逻辑从 `textContent` 整块切分改为 TreeWalker 按文本节点遍历（`extractUnits`），块级祖先切换处断行、H1-H6 行标记为小标题并强制开新段（一个小标题起一段，段仍受 200 字上限约束，超长段句级续切）；`br` 替换为 `\n` 文本节点断行。dev 实测 21/21 小标题全部位于段首、播放正常零报错，preview 生产冒烟通过
   - 附带结论：切倍速会重置本段进度 + 变化显示时长是 **Web Speech API 限制**——`utterance.rate` 在 `speak()` 后不可改（只能 cancel 重读），且 API 无播放位置接口（时长为库按字数÷语速估算）；如需进度连续可改为"倍速下一段生效"
 - `ea08719` 面试题文章新增「有声文章」：基于 `@leelaa/vitepress-plugin-extended` 的 ToSpeech 分段朗读播放器（`src/components/interview/article-speech.vue`）：
