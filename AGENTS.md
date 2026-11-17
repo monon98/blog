@@ -18,6 +18,7 @@ No lint, typecheck, or test scripts exist. Do not add code quality tooling unles
 ## Architecture
 
 - **Framework**: VitePress 2.0.0-alpha.19 (Vite 8 + Rolldown), configured in `.vitepress/config.mts`
+- **Theme**: `.vitepress/theme/`（`index.ts` extends 默认主题 + 注册全局组件；`ttsPlugin.ts` markdown-it 插件向面试题文章 H1 下注入有声阅读播放器）
 - **CSS minify**: `esbuild`（config 中显式指定，绕过 lightningcss 对主题样式的压缩报错）
 - **Source dir**: `src/` (not root). Content lives in `src/docs/`
 - **Output dir**: `dist/`
@@ -76,9 +77,16 @@ Sidebar in `.vitepress/sidebar.ts` auto-generates from the filesystem. File/dire
 - PowerShell 输出中文文件名乱码：先 `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8`
 - **md 页面是整页编译成 Vue 模板**：正文行内反引号代码含 `{{ }}` 会被当插值执行（曾致 31 个详情页 SSR TypeError、文档页内容渲染成 `0`），必须用 `<span v-pre>` 包裹；围栏代码块与 `<<<` snippet 天然安全。改完 md 后 `pnpm build` 若退出码 0，仍要 grep 输出确认无 `TypeError`
 - 侧边栏每个子目录会显示一个多余的 "index" 条目（`index.md` 的既有行为），guide/interview 均如此，属已知非 bug
+- **`@leelaa/vitepress-plugin-extended` 的引入方式被 config.mts 的 regex alias 限定**：只能 `import ToSpeech from '包名'`（默认导入，被直连到 `dist/ToSpeech.js`）——从库入口 `index.js` 导入会拖入 mermaid/three/d3（主题 chunk 曾膨胀到 1053KB）；`<ToSpeech>` 使用前必包 `<ClientOnly>`——其 setup 的 immediate watch 会调 `stop()` 裸读 `speechSynthesis`，SSR 必抛 ReferenceError
 
 ## Session history
 
+- `ea08719` 面试题文章新增「有声文章」：基于 `@leelaa/vitepress-plugin-extended` 的 ToSpeech 分段朗读播放器（`src/components/interview/article-speech.vue`）：
+  - 定位：markdown-it 插件 `.vitepress/theme/ttsPlugin.ts` 在构建期向面试题文章首个 H1 的 `heading_close` 后注入 `<ArticleSpeech />`（主题 doc-before/doc-after 插槽在 H1 外侧不满足"标题下方"）；门禁双保险 = 插件 `env.relativePath.startsWith('docs/interview/')` + 组件 `route.data.relativePath`（`route.path` 含 `/blog/` base 不可用）
+  - 多次合成：单 ToSpeech 实例动态换 `:text` 分段接力（≤200 字/段、句末标点切分），watch expose 的 `isPlaying` 由 true→false 且 phase 仍为 playing 时推进下一段；切倍速用 600ms 抑制窗防误跳段；8s `resume()` 心跳防 Chrome 长语音 15s 卡死
+  - 正文提取：克隆 `.vp-doc`、删 `pre`/按钮/锚点/播放器自身，手动给块级标签后插 `\n`（`textContent` 不补换行；保留折叠 details 题解内容）
+  - 踩坑 4 处：① ToSpeech 必包 `<ClientOnly>`（setup 的 immediate watch 调 `stop()` 裸读 `speechSynthesis`，SSR 必抛 ReferenceError——SSR 下 `runsImmediately` 的 watch 会执行）；② 库入口 index.js 拖入 mermaid/three/d3，须 regex alias 直连 `dist/ToSpeech.js` + 默认导入（主题 chunk 1053KB→72KB）；③ 进度条公式忘把单段 `progress`(0-100) 除以 100；④ `'paused'` 恢复时未把 phase 改回 `'playing'`（keep-alive/接力失效）
+  - 实测：dev + preview（生产）双环境全过——播放/暂停/恢复/停止/重启、切倍速不跳段、19 段接力、1× 单段 33s 连续朗读（跨 15s 阈值×3）自然进段、切页自动停播、非面试题页无播放器、深浅色适配、零控制台报错
 - `9161ff3` 面试代码题新增数据库编程题栏目：LeetCode SQL 全量 323 题题解：
   - `src/docs/code/03. 数据库编程题/` 按 8 个知识点分目录：01. 基础查询(30) / 02. 多表连接(45) / 03. 聚合与分组(87) / 04. 子查询与 CTE(24) / 05. 窗口函数(40) / 06. 字符串与日期(36) / 07. 增删改操作(6) / 08. 综合与难题(55)，共 323 题（简单 113 / 中等 144 / 困难 66，含 VIP 付费题 218 道）+ 1 总索引 + 8 分类索引（由脚本生成）
   - 每题页面结构：难度/标签/原题链接 → 题目描述（免费题用 leetcode.cn GraphQL 抓官方原文逐字保留；VIP 题 `translatedContent` 为 null，按表结构 + 测试数据补写并在页首加 VIP 标注引用块）→ 默认折叠的题解（思路 + MySQL 8 实现 + 复杂度）→ 建表与测试数据
