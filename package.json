@@ -9,5 +9,8 @@
     "@types/node": "^22.18.13",
     "esbuild": "^0.28.2",
     "vitepress": "2.0.0-alpha.21"
+  },
+  "dependencies": {
+    "@leelaa/vitepress-plugin-extended": "1.0.7"
   }
 }
