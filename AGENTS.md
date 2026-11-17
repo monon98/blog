@@ -78,9 +78,16 @@ Sidebar in `.vitepress/sidebar.ts` auto-generates from the filesystem. File/dire
 - **md 页面是整页编译成 Vue 模板**：正文行内反引号代码含 `{{ }}` 会被当插值执行（曾致 31 个详情页 SSR TypeError、文档页内容渲染成 `0`），必须用 `<span v-pre>` 包裹；围栏代码块与 `<<<` snippet 天然安全。改完 md 后 `pnpm build` 若退出码 0，仍要 grep 输出确认无 `TypeError`
 - 侧边栏每个子目录会显示一个多余的 "index" 条目（`index.md` 的既有行为），guide/interview 均如此，属已知非 bug
 - **`@leelaa/vitepress-plugin-extended` 的引入方式被 config.mts 的 regex alias 限定**：只能 `import ToSpeech from '包名'`（默认导入，被直连到 `dist/ToSpeech.js`）——从库入口 `index.js` 导入会拖入 mermaid/three/d3（主题 chunk 曾膨胀到 1053KB）；`<ToSpeech>` 使用前必包 `<ClientOnly>`——其 setup 的 immediate watch 会调 `stop()` 裸读 `speechSynthesis`，SSR 必抛 ReferenceError
+- **PowerShell 5.1 跑含中文的 `.ps1` 必须先重存 UTF-8 with BOM**（无 BOM 时源码中文被按 ANSI 读，字符串匹配/拼接全挂）；核对类脚本输出用 `Write-Host` 而非 `Write-Output`（后者会把函数返回值混进结果）；脚本内字符串插值访问成员要写 `$($obj.prop)`
+- **力扣题面从 leetcode.cn GraphQL 抓**（列表 `problemsetQuestionList{ total questions{...} }`、单题 `question(titleSlug)`、必须带 Referer、introspection 被禁、VIP 题题面双语 NULL）及大批量题页生产流程，见 `.opencode/skills/content-creation/SKILL.md` §「大批量力扣题页生产」
 
 ## Session history
 
+- （本会话进行中，commit 待补）力扣 JS 专项 67 题收录至 `src/docs/code/04. 力扣 JS 专项/` 并替换 02 前端编程题中 21 道相似题：
+  - 经验已沉淀到 `.opencode/skills/content-creation/SKILL.md` §「大批量力扣题页生产」：leetcode.cn GraphQL 查询模板与字段坑（`problemsetQuestionList{ total questions }`、单题无 `frontendQuestionId/paidOnly`、introspection 禁用、必须带 Referer）、VIP 30 题官方题面双语 NULL → 用 doocs/walkccc 镜像站核对后整理题面 + 页首标注块
+  - 分批生产模式：一份生产规范 spec + 按分类切的 `catNN.json` 素材 + 每分类一个子代理并行写题页（禁建 index/禁跑 build）+ 索引由脚本从素材统一生成 + 只读核对脚本（文件名/H1/头部行/章节/围栏配对/围栏外 `{{}}` 与 HTML 残留/索引死链）ALL-PASS 才 `pnpm build` 才 commit
+  - 替换映射修正：2690「无穷方法对象」是 Proxy 任意方法返回方法名，**与 Object.create 无关**（早期印象比对误判，说明相似度比对必须核对英文题名/题面）；Object.create 无对应力扣题 → 留在必要性排查名单
+  - 待办：02 前端编程题剩余 30 题逐题必要性报告交用户定去留，保留者标非力扣来源；删除后子目录编号断档统一推迟最后一批一次重编号
 - `5ae4c28` 有声文章按 H2 分章节：章节下拉 + 每个 H2 行内独立播放按钮（用户选定「并存都保留」+「标题行尾内联」）：
   - 新增模块级共享 store `src/components/interview/speechStore.ts`（segments/segIndex/phase/rate/scope/chapters/ready + `actions.toggle` 由播放器挂载时注入），主播放器与 `h2-speech.vue` 按钮共用；H2 按钮经 `toggleH2(k)` 指挥：非当前章 = 改 scope（播放器内 watch 执行跳转开播），当前章 = 暂停/继续；朗读中该章按钮高亮 ⏸️
   - `ttsPlugin.ts` 重写：向每个 h2 的 `heading_close` **前**注入 `<H2Speech :index="k" />`（组件在标题行尾；k=token 顺序=DOM 顺序）；注入点在 inline token 之后，VitePress TOC/slug 只读 heading_open+inline → 侧边栏/目录不受影响（已实测）
