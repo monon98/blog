@@ -9,7 +9,7 @@ import ToSpeech from '@leelaa/vitepress-plugin-extended'
  * 有声文章播放器（面试题专用）
  *
  * - 由 .vitepress/theme/ttsPlugin.ts 在文章 H1 标题后注入（构建期定位，SSR 一致）
- * - 文章正文提取 → 按句分段 → 单个 ToSpeech 实例动态换 text 接力朗读（多次合成）
+ * - 文章正文提取 → 按小标题对齐 + 按句分段 → 单个 ToSpeech 实例动态换 text 接力朗读（多次合成）
  * - ToSpeech 必须包在 ClientOnly 内：其 setup 的 immediate watch 会调用 stop()，
  *   stop() 裸读 speechSynthesis，服务端渲染会抛 ReferenceError
  * - 段间接力依赖 ToSpeech 的 expose 状态（exposeProxy 经 proxyRefs 解包，watcher 可直接跟踪）
@@ -86,37 +86,83 @@ function splitSentences(text: string, max: number): string[] {
   return out
 }
 
-function splitIntoSegments(text: string, max = MAX_SEGMENT): string[] {
-  const lines = text
-    .split(/\n+/)
-    .map((l) => l.trim())
-    .filter(Boolean)
-  const units: string[] = []
-  for (const line of lines) {
-    if (line.length <= max) units.push(line)
-    else units.push(...splitSentences(line, max))
+/** 分段单元：text 为一行文本，heading 标记该行是否为小标题（H1-H6） */
+interface Unit {
+  text: string
+  heading: boolean
+}
+
+function splitIntoSegments(units: Unit[], max = MAX_SEGMENT): string[] {
+  // 单个超长行先按句末标点切开（首块保留标题标记）
+  const pieces: Unit[] = []
+  for (const u of units) {
+    if (u.text.length <= max) {
+      pieces.push(u)
+    } else {
+      splitSentences(u.text, max).forEach((p, i) => pieces.push({ text: p, heading: u.heading && i === 0 }))
+    }
   }
+  // 打包：遇到小标题强制开新段（一个小标题起一段），其次受 max 长度约束
   const result: string[] = []
   let cur = ''
-  for (const u of units) {
-    if (cur && cur.length + u.length + 1 > max) {
+  for (const p of pieces) {
+    if (!cur) {
+      cur = p.text
+    } else if (p.heading || cur.length + p.text.length + 1 > max) {
       result.push(cur)
-      cur = u
+      cur = p.text
     } else {
-      cur = cur ? `${cur}\n${u}` : u
+      cur = `${cur}\n${p.text}`
     }
   }
   if (cur) result.push(cur)
   return result
 }
 
+/** 块级标签（用于识别"行"边界与小标题）；容器级标签不参与 */
+const BLOCK_SEL = 'p,h1,h2,h3,h4,h5,h6,li,td,th,summary,blockquote,figcaption,tr'
+const HEADING_RE = /^H[1-6]$/
+
 /**
- * 提取文章正文：
+ * 提取文章正文为带标题标记的行单元：
  * - 克隆 .vp-doc 后处理，不影响页面
  * - 删除代码块/按钮/锚点/播放器自身（朗读不读代码）
- * - textContent 不会为块级元素补换行 → 手动给块级标签后插 \n，
- *   这样能保留折叠 details（题解）里的文本（innerText 在隐藏内容上会丢）
+ * - 按文本节点顺序走 DOM：块级元素切换处断行（textContent 不会为块级补换行；
+ *   innerinnerText 在折叠 details 上会丢文本，故手动遍历），同一块内 br 产生的 \n 也断行
+ * - 文本节点的最近块级祖先若是 H1-H6，该行标记为小标题 → 分段时强制开新段
  */
+function extractUnits(clone: HTMLElement): Unit[] {
+  const walker = document.createTreeWalker(clone, NodeFilter.SHOW_TEXT)
+  const units: Unit[] = []
+  let cur = ''
+  let curHeading = false
+  let lastBlock: Element | null = null
+  let started = false
+
+  const flush = () => {
+    for (const line of cur.split('\n')) {
+      const t = line.trim()
+      if (t) units.push({ text: t, heading: curHeading })
+    }
+    cur = ''
+  }
+
+  let node = walker.nextNode()
+  while (node) {
+    const block = node.parentElement?.closest(BLOCK_SEL) ?? null
+    if (!started || block !== lastBlock) {
+      flush()
+      lastBlock = block
+      started = true
+      curHeading = !!block && HEADING_RE.test(block.tagName)
+    }
+    cur += node.textContent
+    node = walker.nextNode()
+  }
+  flush()
+  return units
+}
+
 function extractSegments(): string[] {
   const doc = document.querySelector('.vp-doc')
   if (!doc) return []
@@ -124,10 +170,9 @@ function extractSegments(): string[] {
   clone
     .querySelectorAll('pre, script, style, button, svg, canvas, a.header-anchor, [data-tts-root]')
     .forEach((el) => el.remove())
-  clone
-    .querySelectorAll('p, h1, h2, h3, h4, h5, h6, li, tr, td, th, summary, blockquote, figcaption, br')
-    .forEach((el) => el.after(document.createTextNode('\n')))
-  return splitIntoSegments(clone.textContent || '')
+  // br 换成 \n 文本节点：同一块级元素内的换行在遍历时不会触发断行，靠 flush 时按 \n 拆行
+  clone.querySelectorAll('br').forEach((br) => br.replaceWith(document.createTextNode('\n')))
+  return splitIntoSegments(extractUnits(clone))
 }
 
 // ---------- 段间接力 ----------
