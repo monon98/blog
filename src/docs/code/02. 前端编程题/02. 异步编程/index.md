@@ -8,8 +8,8 @@
 
 ## 目录
 
-- [手写 Promise](./03.%20手写%20Promise) — 困难
-- [手写 Promise.all](./04.%20手写%20Promise.all) — 简单
-- [手写 Promise.race](./05.%20手写%20Promise.race) — 入门
-- [手写 Promise.allSettled](./06.%20手写%20Promise.allSettled) — 简单
-- [手写 Promise.any](./07.%20手写%20Promise.any) — 简单
+- [手写 Promise](./01.%20手写%20Promise) — 困难
+- [手写 Promise.all](./02.%20手写%20Promise.all) — 简单
+- [手写 Promise.race](./03.%20手写%20Promise.race) — 入门
+- [手写 Promise.allSettled](./04.%20手写%20Promise.allSettled) — 简单
+- [手写 Promise.any](./05.%20手写%20Promise.any) — 简单

@@ -38,7 +38,7 @@ sidebar: false
 
 ## 4. 图片懒加载 / 瀑布流（原生 HTML）
 
-关联题目：[06. 图片懒加载](../docs/code/02.%20前端编程题/03.%20经典场景/06.%20图片懒加载)
+关联题目：[04. 图片懒加载](../docs/code/02.%20前端编程题/03.%20经典场景/04.%20图片懒加载)
 
 `IntersectionObserver` 进入视口才给 `img.src` 赋值，图片用内联 SVG data URI，无外部依赖。
 
@@ -48,7 +48,7 @@ sidebar: false
 
 ## 5. Promise 链式调用演示（原生 HTML）
 
-关联题目：[03. 手写 Promise](../docs/code/02.%20前端编程题/02.%20异步编程/03.%20手写%20Promise)
+关联题目：[01. 手写 Promise](../docs/code/02.%20前端编程题/02.%20异步编程/01.%20手写%20Promise)
 
 分别点击 resolve / reject，观察值在链上的流转与 catch、finally 的执行时机。
 

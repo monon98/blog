@@ -8,4 +8,4 @@
 
 ## 目录
 
-- [数组洗牌 Fisher-Yates](./03.%20数组洗牌%20Fisher-Yates) — 入门
+- [数组洗牌 Fisher-Yates](./01.%20数组洗牌%20Fisher-Yates) — 入门
