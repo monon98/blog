@@ -83,6 +83,14 @@ Sidebar in `.vitepress/sidebar.ts` auto-generates from the filesystem. File/dire
 
 ## Session history
 
+- `c7030ee` → `255e849` 力扣算法题库改名 + 172 题 5 语言补齐（全部未 push）：
+  - 任务1：`01. leetcode/index.md` H1 改「力扣算法题库」并挂 https://leetcode.cn/problemset/algorithms/ ，同步 `code/index.md`、`02/03` 分组 index 三处交叉引用
+  - 任务2：原 100 题页题解全部改为 **4 冒号 details 内嵌 3 冒号 code-group**（嵌套铁律：外层冒号数 ≥ 内层），语言顺序固定 JavaScript→Python→Rust→Go→Java，3 个双 JS 特殊页保留双解法标签（丢失的数字·异或 / 移动零·交换版 / 反转链表·递归）
+  - 任务3：新增 8 个进阶分组 72 题（滑动窗口与前缀和 10 / 回溯 10 / 贪心 8 / 堆与优先队列 6 / 图与搜索 9 / 中级动态规划 12 / 链表进阶 7 / 二叉树进阶 10），题库 100 → 172 题；分组 index + 总 index 由脚本从素材统一生成（幂等）
+  - 生产模式沿用 spec + 素材 JSON + 按分组并行子代理（禁建 index/禁跑 build）+ 只读核对脚本 ALL-PASS 才 build 才 commit；免费额度多次中断靠原 sessionID 续跑完成
+  - 题面 HTML→Markdown 转换踩坑（改 `fetch-additions.mjs` 后重新抓取修复）：空白-only `<em>/<strong>` 会产出 `* *`/`** **` 残留（CommonMark 闭合星前带空格**不闭合**，渲染成字面星号）→ 降级为空格；`<code><strong>k</strong></code>` 会产出 `` `**k**` `` → code 内先剥样式标签；强调内侧首尾空格要修剪；空白 `<sup>/<sub>` 产出裸 `^`/`_`；`<em><strong>` 嵌套产出 `***` → 归一 `**`；**禁止全局压空格**（会毁掉代码块缩进，曾误伤后靠重新抓取还原）
+  - 核对脚本两个固有误报源：CRLF 行尾（split 用 `/\r?\n/`）、围栏内 `10^5`/`3 * 10^4` 的 `^`/`*` 是正文（诊断时必须先剥围栏与行内 code）
+  - 过程中抓出的真实转录错误均靠「题面逐行按序比对」发现：11/04 示例解释 `"ab"` 误写 `"abc"`、15/05 省份数量题面在素材侧偶发截断（重抓原始 HTML 补齐 6 条提示）
 - `f2f349f` → `763882a` → `31a4e0e` → `4be3b1b` 力扣 JS 专项 67 题收录至 `src/docs/code/04. 力扣 JS 专项/` 并替换 02 前端编程题中 21 道相似题（全部未 push）：
   - 经验已沉淀到 `.opencode/skills/content-creation/SKILL.md` §「大批量力扣题页生产」：leetcode.cn GraphQL 查询模板与字段坑（`problemsetQuestionList{ total questions }`、单题无 `frontendQuestionId/paidOnly`、introspection 禁用、必须带 Referer）、VIP 30 题官方题面双语 NULL → 用 doocs/walkccc 镜像站核对后整理题面 + 页首标注块
   - 分批生产模式：一份生产规范 spec + 按分类切的 `catNN.json` 素材 + 每分类一个子代理并行写题页（禁建 index/禁跑 build）+ 索引由脚本从素材统一生成 + 只读核对脚本（文件名/H1/头部行/章节/围栏配对/围栏外 `{{}}` 与 HTML 残留/索引死链）ALL-PASS 才 `pnpm build` 才 commit
