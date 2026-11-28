@@ -4,9 +4,12 @@
  * 用法：
  *   node scripts/import-juejin.mjs <掘金链接> <分类> [序号]
  *   node scripts/import-juejin.mjs <掘金链接> <分类> [序号] --desc "一句话说明"
+ *   node scripts/import-juejin.mjs <掘金链接> <分类> [序号] --from-file <本地HTML路径>
  *
  * 例：
  *   node scripts/import-juejin.mjs "https://juejin.cn/post/7564681385294921737" 前端
+ *   # 从本地缓存 HTML 转换（不联网，转换器改动后重转用）：
+ *   node scripts/import-juejin.mjs "https://juejin.cn/post/7564681385294921737" 前端 012 --from-file .tmp-juejin-raw/7564681385294921737.html
  *
  * 行为：
  *   1. 抓取文章（复用 fetch-juejin.mjs）
@@ -19,7 +22,7 @@
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { fetchArticle } from './fetch-juejin.mjs';
+import { fetchArticle, parseLocalFile } from './fetch-juejin.mjs';
 
 const ROOT = process.cwd();
 const REPOSTS = path.join(ROOT, 'src', 'docs', 'collection', 'reposts');
@@ -31,7 +34,12 @@ function safeName(s) {
     .replace(/[\\/:*?"<>|]/g, '_')
     .replace(/\s+/g, ' ')
     .trim()
-    .slice(0, 80);
+    .slice(0, 80)
+    // 文件名里的裸 '%' 会让 VitePress 构建失败：
+    //   - sidebar link → normalize() → decodeURI() → URIError: URI malformed
+    //   - 页面加载 → pathToFile() → decodeURIComponent() → URIError: URI malformed
+    // 统一换成视觉等价的全角 '％'（中文排版里也更规范）。
+    .replace(/%/g, '％');
 }
 
 /** 取 <分类> 目录内现有最大序号 */
@@ -134,7 +142,11 @@ async function main() {
     return;
   }
 
-  const art = await fetchArticle(url);
+  // --from-file <本地HTML路径>：从缓存的 HTML 转换，不联网（避免反爬冷却）
+  const fromFileIdx = argv.indexOf('--from-file');
+  const art = fromFileIdx >= 0
+    ? await parseLocalFile(path.resolve(argv[fromFileIdx + 1]), url)
+    : await fetchArticle(url);
   if (art.blocked) {
     console.error('正文疑似被登录墙/付费墙截断，请改用浏览器手动获取后再入库：' + url);
     process.exit(2);

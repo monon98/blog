@@ -18,6 +18,21 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 
 const POST_ID_RE = /juejin\.cn\/post\/(\d+)/;
 
+/** 从本地 HTML 文件解析文章（不联网，供转换器改动后重转用） */
+export async function parseLocalFile(file, url) {
+  const raw = await fs.readFile(file, 'utf8');
+  if (!raw.includes('article-root') && !raw.includes('markdown-body')) {
+    throw new Error('本地 HTML 不含正文（不是有效的文章页）：' + file);
+  }
+  const art = parseArticle(raw, url);
+  const ctime = /ctime:"(\d+)"/.exec(raw)?.[1];
+  const created = ctime
+    ? ctimeToLocal(ctime)
+    : (art.timeAttr ? art.timeAttr.replace('T', ' ').replace(/\.\d+Z$/, '').replace(/Z$/, '') : '');
+  const blocked = /登录后查看|阅读全文需付费|开通会员|付费专栏|阅读全文/.test(art.body.slice(0, 800));
+  return { ...art, created, blocked, bodyLength: art.body.length };
+}
+
 /** 从 SSR HTML 中抽取元数据与正文 */
 export function parseArticle(raw, url) {
   const title =
